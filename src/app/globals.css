@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
+/* :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
@@ -24,4 +24,18 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
+} */
+
+/* components/MovingImage.module.css */
+@keyframes moveFromLeft {
+  from {
+    transform: translateX(-100%); /* Move from left */
+  }
+  to {
+    transform: translateX(0); /* Move to initial position */
+  }
+}
+
+.movingImage {
+  animation: moveFromLeft 1s ease-in-out; /* Adjust duration and easing function as needed */
 }
