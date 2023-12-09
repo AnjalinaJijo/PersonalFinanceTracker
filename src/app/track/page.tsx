@@ -1,4 +1,5 @@
 import TrackerTable from '../components/TrackerTable.jsx'
+import Image from 'next/image'
 
 export default function Track() {
   return (

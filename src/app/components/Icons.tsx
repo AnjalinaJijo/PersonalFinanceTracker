@@ -2,6 +2,10 @@ import React from "react";
 
 type IconProps = React.SVGProps<SVGSVGElement>
 
+type PlusIconProps={
+  size?:number
+}&IconProps
+
 export const DeleteIcon = (props:IconProps) => (
   <svg
     aria-hidden="true"
@@ -114,5 +118,29 @@ export const EditIcon = (props:IconProps) => (
         strokeLinejoin="round"
         strokeWidth={1.5}
       />
+    </svg>
+  );
+
+  export const PlusIcon = ({ size = 24, width, height, ...props }:PlusIconProps) => (
+    <svg
+      aria-hidden="true"
+      fill="none"
+      focusable="false"
+      height={24}
+      role="presentation"
+      viewBox="0 0 24 24"
+      width={24}
+      {...props}
+    >
+      <g
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1.5}
+      >
+        <path d="M6 12h12" />
+        <path d="M12 18V6" />
+      </g>
     </svg>
   );

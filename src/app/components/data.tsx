@@ -1,11 +1,11 @@
 
 const columns = [
   {name: "DATE", uid: "date"},
-  {name: "Activity", uid: "activity"},
+  {name: "ACTIVITY", uid: "activity"},
   {name: "CATEGORY", uid: "category"},
   {name: "AMOUNT", uid: "amount"},
   {name: "DESCRIPTION", uid: "description"},
-  {name: "Actions", uid: "actions"},
+  {name: "ACTIONS", uid: "actions"},
 ];
 
 const expenses = [

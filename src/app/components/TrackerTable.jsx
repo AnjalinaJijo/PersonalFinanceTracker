@@ -2,17 +2,34 @@
 
 import React from "react";
 import { useCallback, useMemo, useState } from "react";
-import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, User, Chip, Tooltip, getKeyValue, Button, Pagination} from "@nextui-org/react";
-import {EditIcon} from "./Icons";
-import {DeleteIcon} from "./Icons";
-import {EyeIcon} from "./Icons";
+import {
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+  Tooltip,
+  Input,
+  Button,
+  DropdownTrigger,
+  Dropdown,
+  DropdownMenu,
+  DropdownItem,
+  Chip,
+  User,
+  Pagination,
+} from "@nextui-org/react";
+import {PlusIcon} from "./Icons";
 import {columns, expenses} from "./data";
+import {RenderCell} from "./RenderCell";
 
 const statusColorMap = {
   active: "success",
   paused: "danger",
   vacation: "warning",
 };
+
 
 export default function TrackerTable() {
 
@@ -27,81 +44,25 @@ export default function TrackerTable() {
     return expenses.slice(start, end)
   }, [page])
 
-  const renderCell = React.useCallback((expense, columnKey) => {
-    const cellValue = expense[columnKey];
 
-
-  const options={
-    year: "2-digit",
-    month: "2-digit",
-    day: "2-digit",
-  }
-
-    switch (columnKey) {
-      case "date":
-        return (
-         <div>{new Date(cellValue).toLocaleDateString("en-us",options)}</div>
-        );
-      case "role":
-        return (
-          <div className="flex flex-col">
-            <p className="text-bold text-sm capitalize">{cellValue}</p>
-            <p className="text-bold text-sm capitalize text-default-400">{user.team}</p>
-          </div>
-        );
-      case "activity":
-        return (
-          <Chip className="capitalize" color={statusColorMap[user.status]} size="sm" variant="flat">
-            {cellValue}
-          </Chip>
-        );
-      case "category":
-        return (
-          <Chip className="capitalize" color={statusColorMap[user.status]} size="sm" variant="flat">
-            {cellValue}
-          </Chip>
-        );
-      case "amount":
-        return (
-          <Chip className="capitalize" color={statusColorMap[user.status]} size="sm" variant="flat">
-            {cellValue}
-          </Chip>
-        );
-      case "description":
-        return (
-          <Chip className="capitalize" color={statusColorMap[user.status]} size="sm" variant="flat">
-            {cellValue}
-          </Chip>
-        );
-      case "actions":
-        return (
-          <div className="relative flex items-center gap-2">
-            <Tooltip content="Details">
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <EyeIcon />
-              </span>
-            </Tooltip>
-            <Tooltip content="Edit user">
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <EditIcon />
-              </span>
-            </Tooltip>
-            <Tooltip color="danger" content="Delete user">
-              <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                <DeleteIcon />
-              </span>
-            </Tooltip>
-          </div>
-        );
-      default:
-        return cellValue;
-    }
-  }, []);
+  const topContent= useMemo(()=>{
+    return(
+    <div className="flex justify-end">
+      <div>
+            <Button className="bg-MediumPurple3" endContent={<PlusIcon />}>
+              Add New
+            </Button>
+            </div>
+    </div>
+    )
+  },[])
 
   return (
   <Table 
     isStriped
     aria-label="Table to track expenses"
+    topContent={topContent}
+    topContentPlacement="outside"
     bottomContentPlacement="outside"
     bottomContent={
       <div className="flex w-full justify-center">
@@ -130,7 +91,7 @@ export default function TrackerTable() {
       <TableBody items={items} >
         {(item) => (
           <TableRow key={item.id}>
-            {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
+            {(columnKey) => <TableCell>{RenderCell(item, columnKey)}</TableCell>}
           </TableRow>
         )}
       </TableBody>
