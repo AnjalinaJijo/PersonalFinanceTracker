@@ -1,8 +1,7 @@
 
-
 export default function Navbar() {
   return (
-    <div className="flex justify-between p-5 m-5 font-serif">
+    <div className="flex justify-between p-10 font-serif">
         <div className="flex lg:text-2xl md:text-xl font-bold">
             <h1>Rich With Money</h1>
         </div>

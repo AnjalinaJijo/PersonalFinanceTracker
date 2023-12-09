@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function dashboard() {
+export default function Dashboard() {
   return (
     <div className="p-10">
       <div className="relative flex w-fit mb-2 bg-gray-700 border-2 border-slate-600 rounded-2xl">
