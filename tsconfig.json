@@ -22,6 +22,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/components/TrackerTable.jsx", "src/app/components/Icons.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/components/TrackerTable.jsx", "src/components/Icons.tsx", "src/app/login/page.jsx", "src/components/data.jsx", "src/components/IncomeRenderCell.jsx", "src/app/api/auth/[...nextauth]/route.js", "src/app/dashboard/page.js", "src/app/dashboard/user/[id]/page.js"],
   "exclude": ["node_modules"]
 }

@@ -23,7 +23,8 @@ module.exports = {
         'PompandandPower':'#86608E',
         'MediumPurple3':'#8968CD',
         'Mulberry':'#C54B8C',
-
+        'lightCream':'#F5EEE6',
+        'pink':'#E6A4B4'
       },
   
       animation:{

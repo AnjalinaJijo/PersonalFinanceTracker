@@ -6,6 +6,26 @@ type PlusIconProps={
   size?:number
 }&IconProps
 
+export const SaveIcon = () => {
+  return (
+    <svg
+  xmlns="http://www.w3.org/2000/svg"
+  fill="none"
+  viewBox="0 0 24 24"
+  stroke="currentColor"
+  className="h-6 w-6"
+>
+  <path
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    strokeWidth="2"
+    d="M4 6h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1zm7 3v3m0 0v4"
+  />
+</svg>
+  );
+};
+
+
 export const DeleteIcon = (props:IconProps) => (
   <svg
     aria-hidden="true"
@@ -144,3 +164,80 @@ export const EditIcon = (props:IconProps) => (
       </g>
     </svg>
   );
+
+
+
+export const Plus = (props) => (
+  <svg
+    aria-hidden="true"
+    fill="none"
+    focusable="false"
+    height="1em"
+    role="presentation"
+    viewBox="0 0 24 24"
+    width="1em"
+    {...props}
+  >
+    <g
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={1.5}
+    >
+      <path d="M6 12h12" />
+      <path d="M12 18V6" />
+    </g>
+  </svg>
+);
+
+
+export const SelectorIcon = (props) => (
+  <svg
+    aria-hidden="true"
+    fill="none"
+    focusable="false"
+    height="1em"
+    role="presentation"
+    stroke="currentColor"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    strokeWidth="1.5"
+    viewBox="0 0 24 24"
+    width="1em"
+    {...props}
+  >
+    <path d="M0 0h24v24H0z" fill="none" stroke="none" />
+    <path d="M8 9l4 -4l4 4" />
+    <path d="M16 15l-4 4l-4 -4" />
+  </svg>
+);
+
+
+export const CheckIcon = (props) =>
+  (
+    <svg
+      aria-hidden="true"
+      fill="none"
+      focusable="false"
+      height="1em"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      viewBox="0 0 24 24"
+      width="1em"
+      {...props}
+    >
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  );
+
+export const MultiplyCross =()=>(
+    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 13.59l-1.41 1.41L12 13.41l-4.59 4.59-1.41-1.41L10.59 12 6 7.41 7.41 6l4.59 4.59L17.41 6l1.41 1.41L13.41 12l4.59 4.59L17.41 18 12 12.59z"></path>
+</svg>
+
+  )
+
+
