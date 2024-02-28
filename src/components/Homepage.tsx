@@ -12,7 +12,7 @@ export default function Homepage() {
               Whether you're looking to track expenses, set budgets, or gain insightful reports,
                we've got you covered. </p>
         <div className="flex justify-center item-center p-10">
-            <button className="bg-LiserianPurple hover:bg-pearlyPurple hover:scale-110 p-5 w-40% rounded-xl text-2xl transition-all ease-in-out duration-300">Start Now</button>
+            <button className="bg-LiserianPurple hover:bg-pearlyPurple hover:scale-90 p-5 w-40% rounded-xl text-2xl transition-all ease-in-out duration-300">Start Now</button>
         </div>
         </div>
         <div className="flex justify-center item-center"> 
