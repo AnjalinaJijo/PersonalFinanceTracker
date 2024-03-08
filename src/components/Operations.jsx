@@ -3,6 +3,11 @@ import getIncome from "../lib/getIncome"
 import getExpense from "../lib/getExpense"
 import {useState,useEffect} from "react";
 import Charts from "./charts"
+
+import DoughnutChart from "./Charts/DoughnutChart"
+import LineChart from "./Charts/LineChart"
+import BarChart from "./Charts/BarChart"
+
 import Goals from "./Goals"
 import Subscriptions from "./Subscriptions"
 
@@ -216,7 +221,7 @@ export  function Operations() {
   return (
     <div>
 
-<div className="m-10 text-white">
+<div className=" text-white">
     <Select
     // label="Favorite Animal"
     placeholder={lineYear}
@@ -236,8 +241,11 @@ export  function Operations() {
   </Select>
   </div>
 
-      <div className="m-10 p-10">
+      <div className="">
     <Charts monthlyExpense={monthlyExpense} monthlyIncome={monthlyIncome} totalCategory={totalExpenseCategory} yearData={yearData} getExpenseData={getExpenseData} getIncomeData={getExpenseData} setMonthlyExpense={setMonthlyExpense} setMonthlyIncome={setMonthlyIncome} totalExpenseCategory={totalExpenseCategory} setTotalExpenseCategory={setTotalExpenseCategory} lineYear={lineYear} setLineYear={setLineYear}/> 
+    <DoughnutChart totalCategory={totalExpenseCategory}/>
+    <LineChart monthlyExpense={monthlyExpense} monthlyIncome={monthlyIncome}/>
+    <BarChart monthlyExpense={monthlyExpense} monthlyIncome={monthlyIncome}/>
       </div>
         <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-4">
         <div className="h-60 p-5 bg-BayernBlue flex flex-col justify-center items-center text-xl rounded-xl">
