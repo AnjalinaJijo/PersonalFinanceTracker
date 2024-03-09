@@ -4,8 +4,7 @@ import './globals.css'
 import Navbar from '../components/Navbar'
 import Providers from '../components/Providers'
 //for navbar toggle
-
-
+import StoreProvider from "./StoreProvider";
 
 export const metadata: Metadata = {
   title: 'FInance Tracker',
@@ -20,6 +19,7 @@ export default function RootLayout({
 
   
   return (
+    <StoreProvider>
     <html lang="en">
       <body className='scroll-smooth dark:text-white text-black dark:bg-gradient-to-b from-gray-800 via-gray-900 to-black  bg-lightWhite'>
         <Providers>
@@ -28,5 +28,6 @@ export default function RootLayout({
         </Providers>
         </body>
     </html>
+    </StoreProvider>
   )
 }
