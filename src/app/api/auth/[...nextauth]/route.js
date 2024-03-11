@@ -1,13 +1,20 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 
+//redux
+import {loginAPI} from "@/lib/features/auth/authSlice"
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+
 import { setCookie } from 'nookies';
 
 // import { NextAuthOptions } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import NextAuth from "next-auth/next";
 
+
+
 async function refreshToken(user) {
+
   console.log('token inside refresh',user)
   const res = await fetch("http://localhost:3500/refresh", {
     method: "POST",
@@ -59,24 +66,30 @@ async function refreshToken(user) {
                   //Credentials -> The credentials to sign-in with
                   //Authorize -> Callback to execute once user is to be authorized(after user types in name and pwd and clicks login)
                   async authorize(credentials, req) {
+
+                    const dispatch = useAppDispatch(); // Access the Redux dispatch function
+
                     // const { username, password } = credentials as any;
                     const { username, password } = credentials;
                     // console.log({username,password})
 
-                    const res = await fetch("http://localhost:3500/login",{
-                        method:"POST",
-                        headers:{
-                            "Content-Type":"application/json"
-                        },
-                        body:JSON.stringify({
-                            username,
-                            password
-                        })
-                    })
+                    // const res = await fetch("http://localhost:3500/login",{
+                    //     method:"POST",
+                    //     headers:{
+                    //         "Content-Type":"application/json"
+                    //     },
+                    //     body:JSON.stringify({
+                    //         username,
+                    //         password
+                    //     })
+                    // })
+
+                    const res = dispatch(loginAPI(username, password));
 
                     const user = await res.json()
-                    // console.log('user',user)
-                    // console.log('hello')
+                    console.log("hello")
+                    console.log('user call response from REDUX',user)
+                    console.log('hello')
                     // console.log('user[0]',user[0])
                     // console.log('hello')
               
@@ -162,7 +175,8 @@ async function refreshToken(user) {
               }
     }
 
-const handler = NextAuth(authOptions);
+const handler = 
+NextAuth(authOptions);
 
 export { handler as GET, handler as POST}
 

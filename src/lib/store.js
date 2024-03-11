@@ -1,4 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
+import {authSlice} from "./features/auth/authSlice"
+
+
+const rootReducer = {
+    auth: authSlice,
+    // Add other reducers here if you have them
+  };
 
 //A Next.js server can handle multiple requests simultaneously. 
 //This means that the Redux store should be created per request 
@@ -7,6 +14,8 @@ import { configureStore } from "@reduxjs/toolkit";
 //creating a Redux Store per Request
 export const makeStore = ()=>{
     return configureStore({
-        reducer:{}
+        reducer:{
+            rootReducer
+        }
     })
 }
