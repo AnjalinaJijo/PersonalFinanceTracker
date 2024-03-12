@@ -1,9 +1,12 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-
+import { useDispatch } from "react-redux";
 //redux
-import {loginAPI} from "@/lib/features/auth/authSlice"
-import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+// Import your store instance
+import { makeStore } from "@/lib/store";
+import { login } from "@/lib/features/auth/authSlice";
+// import { loginAPI } from "@/lib/features/auth/authSlice";
+
 
 import { setCookie } from 'nookies';
 
@@ -11,7 +14,9 @@ import { setCookie } from 'nookies';
 import { JWT } from "next-auth/jwt";
 import NextAuth from "next-auth/next";
 
+import LoginUser from "@/lib/LoginUser";
 
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 
 async function refreshToken(user) {
 
@@ -33,7 +38,7 @@ async function refreshToken(user) {
   
   const response = await res.json();
 
-  console.log("refreshed values IMMPP",response)
+  // console.log("refreshed values IMMPP",response)
   const { accessToken,refreshToken } = response;
 
   
@@ -66,12 +71,14 @@ async function refreshToken(user) {
                   //Credentials -> The credentials to sign-in with
                   //Authorize -> Callback to execute once user is to be authorized(after user types in name and pwd and clicks login)
                   async authorize(credentials, req) {
-
-                    const dispatch = useAppDispatch(); // Access the Redux dispatch function
+                    // console.log("inside authorize")
+                    const store = makeStore();
+                    // const dispatch = useDispatch(); // Get the dispatch function
+                    // console.log("inside authorize")
 
                     // const { username, password } = credentials as any;
                     const { username, password } = credentials;
-                    // console.log({username,password})
+                    // console.log("username and pwd",{username,password})
 
                     // const res = await fetch("http://localhost:3500/login",{
                     //     method:"POST",
@@ -84,30 +91,24 @@ async function refreshToken(user) {
                     //     })
                     // })
 
-                    const res = dispatch(loginAPI(username, password));
-
-                    const user = await res.json()
-                    console.log("hello")
-                    console.log('user call response from REDUX',user)
-                    console.log('hello')
-                    // console.log('user[0]',user[0])
-                    // console.log('hello')
-              
-                    if (res.ok && user.length>0 && user) {
-                      // console.log("user inside authorize",user)
-                      // Any object returned will be saved in `user` property of the JWT
-                      // return {
-                      //   name: user.userName,
-                      //   id:user.id,
-                      // };
-                      return user[0]
-                    } else {
-                      // If you return null then an error will be displayed advising the user to check their details.
-                      return null
-              
-                      // You can also Reject this callback with an Error thus the user will be sent to the error page with the error message as a query parameter
-                    }
-                  }
+                    try {
+                      // Dispatch an action using the store's dispatch function
+                      const result = await store.dispatch(login({username, password}));
+                      // console.log("result in route",result)
+                      // Do something with the result, e.g., check if login was successful
+                      if (result) {
+                        // console.log('result.payload in authSlice',result.payload[0])
+                        // Return the user object if login was successful
+                        return result.payload[0];
+                      } else {
+                        // Return null or handle the error accordingly
+                        return null;
+                      }
+                    } catch (error) {
+                      console.error('Error during login', error);
+                      // Handle the error accordingly
+                      return null;
+                    }}
                 })
               ],
               pages: {
@@ -128,7 +129,7 @@ async function refreshToken(user) {
 
                 //jwt callback to get accessToken
                 async jwt({ token,user}) {
-                //   console.log('Received token:', token);
+                  // console.log('Received token:', token);
                 //  console.log('Received user:', user);
                 //  console.log('Received account:', account)
 

@@ -1,1 +1,0 @@
-// A function to make an async request for income data
