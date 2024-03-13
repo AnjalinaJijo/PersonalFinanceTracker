@@ -1,8 +1,12 @@
 'use client'
-import getIncome from "../lib/getIncome"
-import getExpense from "../lib/getExpense"
+import getIncome from "../lib/fetchFunctions/getIncome"
+import getExpense from "../lib/fetchFunctions/expense/getExpense"
 import {useState,useEffect} from "react";
-import Charts from "./charts"
+
+//redux
+import { selectExpenseArray, setExpenseArray, selectMonthlyExpense, setMonthlyExpense, setCategoryExpense, selectCategoryExpense, setTotalExpense, selectTotalExpense } from "@/lib/features/expense/expenseSlice";
+import { selectIncomeArray, setIncomeArray, selectMonthlyIncome, setMonthlyIncome, setTotalIncome, selectTotalIncome } from "@/lib/features/income/incomeSlice";
+import {useAppSelector, useAppDispatch } from "@/lib/hooks"
 
 import DoughnutChart from "./Charts/DoughnutChart"
 import LineChart from "./Charts/LineChart"
@@ -10,14 +14,22 @@ import BarChart from "./Charts/BarChart"
 
 import Goals from "./Goals"
 import Subscriptions from "./Subscriptions"
+import {DateFormatter} from "./DateFormatter"
 
 import {Select, SelectItem, Button} from "@nextui-org/react";
 import {SelectorIcon} from "./Icons";
 
 export  function Operations() {
 
-    const [getIncomeData, setGetIncomeData] = useState([]);
-    const [getExpenseData, setGetExpenseData] = useState([]);
+    const dispatch = useAppDispatch();
+    const getExpenseData = useAppSelector(selectExpenseArray)
+    const getIncomeData = useAppSelector(selectIncomeArray)
+    const monthlyExpense = useAppSelector(selectMonthlyExpense)
+    const monthlyIncome = useAppSelector(selectMonthlyIncome)
+    const totalExpenseCategory = useAppSelector(selectCategoryExpense)
+
+    // const [getIncomeData, setGetIncomeData] = useState([]);
+    // const [getExpenseData, setGetExpenseData] = useState([]);
     const monthlyData={
     "Jan":0,
     "Feb":0,
@@ -31,8 +43,8 @@ export  function Operations() {
     "Oct":0,
     "Nov":0,
     "Dec":0}
-    const [monthlyExpense, setMonthlyExpense] = useState(monthlyData);
-    const [monthlyIncome, setMonthlyIncome] = useState(monthlyData);
+    // const [monthlyExpense, setMonthlyExpense] = useState(monthlyData);
+    // const [monthlyIncome, setMonthlyIncome] = useState(monthlyData);
     const months= ["Jan",
     "Feb",
     "Mar",
@@ -46,7 +58,7 @@ export  function Operations() {
     "Nov",
     "Dec"]
 
-    const [totalExpenseCategory,setTotalExpenseCategory]= useState({})
+    // const [totalExpenseCategory,setTotalExpenseCategory]= useState({})
     const [monthlyExpenseCategory,setMonthlyExpenseCategory]= useState({})
     
     const [duration,setDuration]= useState("0")
@@ -54,24 +66,20 @@ export  function Operations() {
 
     const [lineYear,setLineYear] = useState(2024)
 
-    
-   
     useEffect(() => {
       const fetchData = async () => {
           try {
               const incomeResponse = await getIncome();
-              setGetIncomeData(incomeResponse);
+              dispatch(setIncomeArray(incomeResponse))
               // console.log('Income response', incomeResponse);
   
               const expenseResponse = await getExpense();
-              setGetExpenseData(expenseResponse);
+              dispatch(setExpenseArray(expenseResponse))
+              // setGetExpenseData(expenseResponse);
               // console.log('Expense response', expenseResponse);
   
               const monIncome = calculateMonthlyTotal(incomeResponse, "income");
               const monExpense = calculateMonthlyTotal(expenseResponse, "expense");
-  
-              // setMonthlyIncome(monIncome);
-              // setMonthlyExpense(monExpense);
   
               calculateCategorySum(expenseResponse);
               // setTotalExpenseCategory(CategorySum);
@@ -81,10 +89,10 @@ export  function Operations() {
       };
   
       fetchData();
+     
   }, []);
 
-
-
+  
       let totalIncome=0;
       let totalExpense=0;
 
@@ -99,20 +107,14 @@ export  function Operations() {
             }
             totalExpense+=parseInt(data.Amount)  
       })
+      dispatch(setTotalExpense(totalExpense))
+      dispatch(setTotalIncome(totalIncome))
       let currentBalance=totalIncome-totalExpense
 
 
 
 
       const calculateMonthlyTotal = (Data, name) => {
-        // console.log('I am called');
-        // console.log('name', name);
-        // console.log('data',Data);
-
-        // name==="expense"?
-        // setMonthlyExpense(monthlyData):
-        // setMonthlyIncome(monthlyData)
-      
         const newMonthlyExpense = { ...monthlyData };
         const newMonthlyIncome = { ...monthlyData };
       
@@ -139,9 +141,11 @@ export  function Operations() {
       
         // Set state once after the loop
         if (name === 'expense') {
-          setMonthlyExpense(newMonthlyExpense);
+          // setMonthlyExpense(newMonthlyExpense);
+          dispatch(setMonthlyExpense(newMonthlyExpense))
         } else {
-          setMonthlyIncome(newMonthlyIncome);
+          // setMonthlyIncome(newMonthlyIncome);
+          dispatch(setMonthlyIncome(newMonthlyIncome))
         }
       };
  
@@ -159,12 +163,6 @@ export  function Operations() {
             // const month = 1;
             const month = date.getMonth();
             const year = date.getFullYear();
-            // console.log("currMonth",currMonth)
-            // console.log("month",month)
-            // console.log("year",year)
-            // console.log("lineyear",lineYear)
-
-
                       
                       //CALCULATE CATEGORY SUM FOR CURRENT MONTH
                       if(month === currMonth && year===lineYear){
@@ -193,7 +191,8 @@ export  function Operations() {
                       }
           })
         // console.log('totalMOOOO',newMonthlyCat)
-        setTotalExpenseCategory(newTotalCat)
+        // setTotalExpenseCategory(newTotalCat)
+        dispatch(setCategoryExpense(newTotalCat))
         setMonthlyExpenseCategory(newMonthlyCat)
       };
 
@@ -242,7 +241,6 @@ export  function Operations() {
   </div>
 
       <div className="">
-    <Charts monthlyExpense={monthlyExpense} monthlyIncome={monthlyIncome} totalCategory={totalExpenseCategory} yearData={yearData} getExpenseData={getExpenseData} getIncomeData={getExpenseData} setMonthlyExpense={setMonthlyExpense} setMonthlyIncome={setMonthlyIncome} totalExpenseCategory={totalExpenseCategory} setTotalExpenseCategory={setTotalExpenseCategory} lineYear={lineYear} setLineYear={setLineYear}/> 
     <DoughnutChart totalCategory={totalExpenseCategory}/>
     <LineChart monthlyExpense={monthlyExpense} monthlyIncome={monthlyIncome}/>
     <BarChart monthlyExpense={monthlyExpense} monthlyIncome={monthlyIncome}/>

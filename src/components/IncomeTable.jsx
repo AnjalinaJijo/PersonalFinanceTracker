@@ -30,7 +30,7 @@ import {IncomeColumn} from "./data.jsx";
 import {IncomeRenderCell} from "./IncomeRenderCell";
 import {IncomeRenderEditing} from "./IncomeRenderEditing.jsx";
 
-import getIncome from "../lib/getIncome"
+import getIncome from "../lib/fetchFunctions/getIncome"
 
 
 export default function IncomeTable() {

@@ -1,4 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
+import authReducer from "./features/auth/authSlice"
+import expenseReducer from "./features/expense/expenseSlice"
+import incomeReducer from "./features/income/incomeSlice"
+import goalReducer from "./features/goal/goalSlice"
+import subscriptionReducer from "./features/subscription/subscriptionSlice"
+
+
 
 //A Next.js server can handle multiple requests simultaneously. 
 //This means that the Redux store should be created per request 
@@ -7,6 +14,16 @@ import { configureStore } from "@reduxjs/toolkit";
 //creating a Redux Store per Request
 export const makeStore = ()=>{
     return configureStore({
-        reducer:{}
+        reducer:{
+            auth:authReducer,
+            expense:expenseReducer,
+            income:incomeReducer,
+            goal:goalReducer,
+            subscription:subscriptionReducer,
+        },
+        middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware({
+          serializableCheck: false,
+        }),
     })
 }

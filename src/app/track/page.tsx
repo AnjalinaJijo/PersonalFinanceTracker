@@ -1,5 +1,5 @@
+//For Expense Fetching
 import TrackerTable from '../../components/TrackerTable.jsx'
-import Image from 'next/image'
 
 export default async function Track() {
   

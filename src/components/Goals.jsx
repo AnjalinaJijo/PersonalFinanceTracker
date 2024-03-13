@@ -4,22 +4,29 @@ import {PlusIcon} from "./Icons";
 import {Plus} from "./Icons";
 import {Button,Tooltip,Slider,Input,Dropdown,DropdownItem,DropdownMenu,DropdownSection,DropdownTrigger,Progress} from "@nextui-org/react";
 
+//redux
+import { selectGoalArray, setGoalArray } from "@/lib/features/goal/goalSlice";
+import {useAppSelector, useAppDispatch } from "@/lib/hooks"
 
 import { useSession } from "next-auth/react"
 import { getSession } from "next-auth/react";
 
-import getGoals from "../lib/getGoals"
+import getGoals from "../lib/fetchFunctions/getGoals"
 import {EditIcon} from "./Icons"
 
 
 const Goals = (monthlyExpenseCategory) => {
+
+
+  const dispatch = useAppDispatch();
+  const getGoalData = useAppSelector(selectGoalArray)
 
   const [addNewClicked,setAddNewClicked] = useState(false)
   const [GoalAmount,setGoalAmount] = useState(0)
   const [category,setCategory] = useState("Select New Goal")
 
   const [triggered, setTriggered] = useState(false);
-  const [getGoalData, setGetGoalData] = useState([]);
+  // const [getGoalData, setGetGoalData] = useState([]);
   const [editing, setEditing] = useState(null);
   // const [isNeg, setIsNeg] = useState(false);
   // let diff=0;
@@ -135,7 +142,8 @@ useEffect(() => {
   const fetchExpenses = async () => {
     try {
       const getResponse = await getGoals();
-      setGetGoalData(getResponse);
+      dispatch(setGoalArray(getResponse))
+      // setGetGoalData(getResponse);
       // console.log('Goals',getResponse)
     } catch (error) {
       console.error("Error fetching goals:", error.message);
