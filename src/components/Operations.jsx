@@ -1,11 +1,11 @@
 'use client'
-import getIncome from "../lib/getIncome"
-import getExpense from "../lib/getExpense"
+import getIncome from "../lib/fetchFunctions/getIncome"
+import getExpense from "../lib/fetchFunctions/expense/getExpense"
 import {useState,useEffect} from "react";
 
 //redux
-import { selectExpenseArray, setExpenseArray, selectMonthlyExpense, setMonthlyExpense } from "@/lib/features/expense/expenseSlice";
-import { selectIncomeArray, setIncomeArray, selectMonthlyIncome, setMonthlyIncome } from "@/lib/features/income/incomeSlice";
+import { selectExpenseArray, setExpenseArray, selectMonthlyExpense, setMonthlyExpense, setCategoryExpense, selectCategoryExpense, setTotalExpense, selectTotalExpense } from "@/lib/features/expense/expenseSlice";
+import { selectIncomeArray, setIncomeArray, selectMonthlyIncome, setMonthlyIncome, setTotalIncome, selectTotalIncome } from "@/lib/features/income/incomeSlice";
 import {useAppSelector, useAppDispatch } from "@/lib/hooks"
 
 import DoughnutChart from "./Charts/DoughnutChart"
@@ -14,6 +14,7 @@ import BarChart from "./Charts/BarChart"
 
 import Goals from "./Goals"
 import Subscriptions from "./Subscriptions"
+import {DateFormatter} from "./DateFormatter"
 
 import {Select, SelectItem, Button} from "@nextui-org/react";
 import {SelectorIcon} from "./Icons";
@@ -25,6 +26,7 @@ export  function Operations() {
     const getIncomeData = useAppSelector(selectIncomeArray)
     const monthlyExpense = useAppSelector(selectMonthlyExpense)
     const monthlyIncome = useAppSelector(selectMonthlyIncome)
+    const totalExpenseCategory = useAppSelector(selectCategoryExpense)
 
     // const [getIncomeData, setGetIncomeData] = useState([]);
     // const [getExpenseData, setGetExpenseData] = useState([]);
@@ -56,7 +58,7 @@ export  function Operations() {
     "Nov",
     "Dec"]
 
-    const [totalExpenseCategory,setTotalExpenseCategory]= useState({})
+    // const [totalExpenseCategory,setTotalExpenseCategory]= useState({})
     const [monthlyExpenseCategory,setMonthlyExpenseCategory]= useState({})
     
     const [duration,setDuration]= useState("0")
@@ -105,6 +107,8 @@ export  function Operations() {
             }
             totalExpense+=parseInt(data.Amount)  
       })
+      dispatch(setTotalExpense(totalExpense))
+      dispatch(setTotalIncome(totalIncome))
       let currentBalance=totalIncome-totalExpense
 
 
@@ -159,12 +163,6 @@ export  function Operations() {
             // const month = 1;
             const month = date.getMonth();
             const year = date.getFullYear();
-            // console.log("currMonth",currMonth)
-            // console.log("month",month)
-            // console.log("year",year)
-            // console.log("lineyear",lineYear)
-
-
                       
                       //CALCULATE CATEGORY SUM FOR CURRENT MONTH
                       if(month === currMonth && year===lineYear){
@@ -193,7 +191,8 @@ export  function Operations() {
                       }
           })
         // console.log('totalMOOOO',newMonthlyCat)
-        setTotalExpenseCategory(newTotalCat)
+        // setTotalExpenseCategory(newTotalCat)
+        dispatch(setCategoryExpense(newTotalCat))
         setMonthlyExpenseCategory(newMonthlyCat)
       };
 

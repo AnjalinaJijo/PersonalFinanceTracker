@@ -14,8 +14,6 @@ import { setCookie } from 'nookies';
 import { JWT } from "next-auth/jwt";
 import NextAuth from "next-auth/next";
 
-import LoginUser from "@/lib/LoginUser";
-
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 
 async function refreshToken(user) {

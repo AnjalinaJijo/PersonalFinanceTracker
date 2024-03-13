@@ -1,6 +1,6 @@
 'use server'
 import { getServerSession } from "next-auth";
-import { authOptions } from "../app/api/auth/[...nextauth]/route.js";
+import { authOptions } from "../../app/api/auth/[...nextauth]/route.js";
 
 export default async function getExpense(){
     const session = await getServerSession(authOptions);

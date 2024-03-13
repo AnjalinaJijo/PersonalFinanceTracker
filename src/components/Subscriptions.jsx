@@ -1,10 +1,19 @@
 import { useEffect, useState, useCallback, useMemo } from "react"
-
 import {Button, Input, DatePicker, Divider,Dropdown,DropdownItem,DropdownMenu,DropdownSection,DropdownTrigger,Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Sub, Chip, Tooltip, getKeyValue} from "@nextui-org/react"
 
-import getSubscriptions from "../lib/getSubscriptions"
+import getSubscriptions from "../lib/fetchFunctions/subscription/getSubscriptions"
+import updateSubscription from "../lib/fetchFunctions/subscription/updateSubscription"
+import postSubscription from "../lib/fetchFunctions/subscription/postSubscription"
+import deleteSubscription from "../lib/fetchFunctions/subscription/deleteSubscription"
+import deleteExpense from "../lib/fetchFunctions/expense/deleteExpense"
+import postExpense from "../lib/fetchFunctions/expense/postExpense"
+
 import { useSession } from "next-auth/react"
 import { getSession } from "next-auth/react";
+
+//redux
+import { selectSubscriptionArray, setSubscriptionArray } from "@/lib/features/subscription/subscriptionSlice";
+import {useAppSelector, useAppDispatch } from "@/lib/hooks"
 
 import { PlusIcon } from "./Icons"
 import { Plus } from "./Icons"
@@ -14,13 +23,17 @@ import { DeleteIcon } from "./Icons"
 import { EditIcon} from "./Icons"
 import { CheckIcon} from "./Icons"
 import { SaveIcon} from "./Icons"
+import { DateFormatter } from "./DateFormatter";
+
 
 export default function Subscriptions() {
 
 const { data: session } = useSession()
 
+const dispatch = useAppDispatch();
+const subData = useAppSelector(selectSubscriptionArray)
+
 const [triggered, setTriggered] = useState(false);
-const [subData, setSubData] = useState([]);
 const [addNewClicked,setAddNewClicked] = useState(false)
 
 
@@ -30,9 +43,6 @@ const [unpay,setUnpay] = useState(false)
 
 let lastResetMonth=0;
 let lastResetYear=0;
-
-
-
 
 const columns = [
     {name: "NAME", uid: "name"},
@@ -82,11 +92,8 @@ const [categoryItems, setCategoryItems] = useState(
   );
 
 
-    const currentDate = new Date();
-     const year = currentDate.getFullYear();
-     const month = String(currentDate.getMonth() + 1).padStart(2, "0");
-     const day = String(currentDate.getDate()).padStart(2, "0");
-     const formattedDate = `${year}-${month}-${day}`;
+     const currentDate = new Date();
+     const formattedDate = DateFormatter();
 
 
     // Get the current month and year for reseting status to unpaid every month
@@ -108,25 +115,21 @@ useEffect(() => {
     const fetchSubscriptions = async () => {
       try {
         const getResponse = await getSubscriptions();
-        setSubData(getResponse);
+        dispatch(setSubscriptionArray(getResponse))
       } catch (error) {
         console.error("Error fetching goals:", error.message);
       }
     };
-  
     fetchSubscriptions();
   }, [triggered,unpay]); // Empty dependency array ensures the effect runs only once,
 
-  console.log('subs',subData)
-
 
   useEffect(() => {
+    //Make all subscriptions back to 0 at the beginning of each month
     const updateSubscriptions = async () => {
       await Promise.all(
         subData.map(async (sub) => {
-          console.log("Inside")
           const lastResetDate = new Date(sub.LastResetDate);
-          console.log("lastResetDate",lastResetDate)
           if (lastResetDate !== null) {
             lastResetMonth = lastResetDate.getMonth() + 1;
             lastResetYear = lastResetDate.getFullYear();
@@ -137,23 +140,13 @@ useEffect(() => {
               (lastResetMonth === currentMonth && lastResetYear !== currentYear)
             ) 
             {
-
-              
-              const latestSession = await getSession();
+              //update sub value to Unpaid and LastResetDate to present formatted Date
               try{
-              const update = await fetch(`http://localhost:3500/subscriptions/${sub.subscriptionID}`, {
-                method: "PUT",
-                headers: {
-                  "Content-Type": "application/json",
-                  "authorization": `Bearer ${latestSession?.user.accessToken}`,
-                },
-                body: JSON.stringify({ ...sub, "status": "Unpaid", "LastResetDate":formattedDate }),
-              });
-  
-              console.log("update", update);
-              // setPaidtrue)
+              const body= { ...sub, "status": "Unpaid", "LastResetDate":formattedDate }
+              const update = await updateSubscription(sub.subscriptionID,body)
               setTriggered(!triggered);
-            }
+              setUnpay(!unpay)
+              }
             catch (error) {
               console.error("Error updating expense:", error.message);
             }
@@ -167,6 +160,8 @@ useEffect(() => {
     updateSubscriptions(); // Call the async function
 },[subData,currentMonth, currentYear])
   
+
+
   const handleAction =(key)=>{
     setNewSubscription({
       ...newSubscription,
@@ -176,7 +171,7 @@ useEffect(() => {
 
 
   const handleEdit = (subscriptionID,sub) => {
-    console.log("handleEdit///")
+    // console.log("handleEdit///")
 
       setEditedValue({
         subscriptionID: sub.subscriptionID,
@@ -190,93 +185,61 @@ useEffect(() => {
   };
 
   
-useEffect(() => {
-  console.log('editedValue:', editedValue);
-}, [editedValue]);
-
-
+// useEffect(() => {
+//   console.log('editedValue:', editedValue);
+// }, [editedValue]);
 
 
 const handlePay = async(sub) => {
-  // Fetch the latest session
-const latestSession = await getSession();
+    const expenseBody = {
+          "Date": formattedDate,
+          "Activity": sub.subscriptionName,
+          "Category": sub.Category,
+          "Amount": sub.subscriptionAmount,
+          "Description": `subscription ${sub.subscriptionID}`
+        }
 
-
-  // Pay should reflect in expenses DB
-  // try {
-    const ExpenseData = await fetch(`http://localhost:3500/expense/${latestSession?.user?.id}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "authorization": `Bearer ${latestSession?.user.accessToken}`
-      },
-      body: JSON.stringify({
-        "Date": formattedDate,
-        "Activity": sub.subscriptionName,
-        "Category": sub.Category,
-        "Amount": sub.subscriptionAmount,
-        "Description": `subscription ${sub.subscriptionID}`
-      })
-    });
-    console.log("After Expense Fetch")
-    
-
-    const expense = await ExpenseData.json();
-    console.log("update Expense", expense.body.expense);
-    
-    //get ExpenseID
+    const expense = await postExpense(expenseBody)
     const ExpenseID=expense.body.expense.ExpenseID
 
     // After saving, reset the editing state to null
-    const update = await fetch(`http://localhost:3500/subscriptions/${sub.subscriptionID}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "authorization": `Bearer ${latestSession?.user.accessToken}`,
-      },
-      body: JSON.stringify({...sub, "status": "Paid","ExpenseID":ExpenseID }),
-    });
+    const body = {...sub, "status": "Paid","ExpenseID":ExpenseID }
+    const update = await updateSubscription(sub.subscriptionID,body)
     console.log("update",update)
-    // setPaidtrue)
     setTriggered(!triggered);
-    // setUnpay(!unpay);
+    setUnpay(!unpay);
     
-  // } catch (error) {
-  //   console.error("Error updating expense:", error.message);
-  // }
+
 };
 
 
     const removePay =async(sub)=>{
       const latestSession = await getSession();
-
       // Before Deleting, set status back to unpaid and ExpenseId to null to avoid foreignKey violations
-      const update = await fetch(`http://localhost:3500/subscriptions/${sub.subscriptionID}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "authorization": `Bearer ${latestSession?.user.accessToken}`,
-        },
-        body: JSON.stringify({...sub, "status": "Unpaid","ExpenseID":null}),
-      });
-      console.log("update",update)
+      const body = {...sub, "status": "Unpaid","ExpenseID":null}
+      const update = await updateSubscription(sub.subscriptionID,body)
+      // const update = await fetch(`http://localhost:3500/subscriptions/${sub.subscriptionID}`, {
+      //   method: "PUT",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //     "authorization": `Bearer ${latestSession?.user.accessToken}`,
+      //   },
+      //   body: JSON.stringify({...sub, "status": "Unpaid","ExpenseID":null}),
+      // });
+      // console.log("update",update)
       // setPaid(true)
       setTriggered(!triggered);
+      const deleteResponse = await deleteExpense(sub.ExpenseID)
+      // const deleteResponse = await fetch(`http://localhost:3500/expense/${sub.ExpenseID}`,{
+      //   method:"DELETE",
+      //   headers:{
+      //       "Content-Type":"application/json",
+      //       "authorization":`Bearer ${latestSession?.user.accessToken}`
+      //   },
+      // })
 
-      const deleteResponse = await fetch(`http://localhost:3500/expense/${sub.ExpenseID}`,{
-        method:"DELETE",
-        headers:{
-            "Content-Type":"application/json",
-            "authorization":`Bearer ${latestSession?.user.accessToken}`
-        },
-      })
-
-      console.log("deleteResponse",deleteResponse)
-
+      // console.log("deleteResponse",deleteResponse)
       setUnpay(!unpay);
-      
-   
-
     }
 
   const renderCell = useCallback((sub, columnKey) => {
@@ -333,17 +296,18 @@ const latestSession = await getSession();
 
 
 const handleSaveSub=async()=>{
-  console.log("session in savesub",session)
-  const GoalData = await fetch(`http://localhost:3500/subscriptions/${session?.user.id}`,{
-    method:"POST",
-    headers:{
-        "Content-Type":"application/json",
-        "authorization":`Bearer ${session?.user.accessToken}`
-    },
-    body:JSON.stringify({"Date":formattedDate,"Category":newSubscription.category,"subscriptionName":newSubscription.name,"subscriptionAmount":newSubscription.amount,"status":"Unpaid"}), 
+
+  const body = {"Date":formattedDate,"Category":newSubscription.category,"subscriptionName":newSubscription.name,"subscriptionAmount":newSubscription.amount,"status":"Unpaid"}
+  const subRes = await postSubscription(body)
+  // const GoalData = await fetch(`http://localhost:3500/subscriptions/${session?.user.id}`,{
+  //   method:"POST",
+  //   headers:{
+  //       "Content-Type":"application/json",
+  //       "authorization":`Bearer ${session?.user.accessToken}`
+  //   },
+  //   body:JSON.stringify({"Date":formattedDate,"Category":newSubscription.category,"subscriptionName":newSubscription.name,"subscriptionAmount":newSubscription.amount,"status":"Unpaid"}), 
  
-  })
-  const goal = await GoalData
+  // })
   // console.log("goal posted",goal)
   //   // After saving, reset the editing state to null
     setAddNewClicked(false)
@@ -425,14 +389,16 @@ const handleCancelSub=()=>{
     const subscriptionID = editedValue.subscriptionID
     try {
       // Perform PUT request with the updated expense data
-      const response = await fetch(`http://localhost:3500/subscriptions/${subscriptionID}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "authorization": `Bearer ${session?.user.accessToken}`,
-        },
-        body: JSON.stringify({"subscriptionName":editedValue["name"],"subscriptionAmount":editedValue["amount"],"Date":formattedDate,"Category":editedValue["category"],"status":"unpaid"}),
-      });
+      const body = {"subscriptionName":editedValue["name"],"subscriptionAmount":editedValue["amount"],"Date":formattedDate,"Category":editedValue["category"],"status":"unpaid"}
+      const response = await updateSubscription(subscriptionID,body)
+      // const response = await fetch(`http://localhost:3500/subscriptions/${subscriptionID}`, {
+      //   method: "PUT",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //     "authorization": `Bearer ${session?.user.accessToken}`,
+      //   },
+      //   body: JSON.stringify({"subscriptionName":editedValue["name"],"subscriptionAmount":editedValue["amount"],"Date":formattedDate,"Category":editedValue["category"],"status":"unpaid"}),
+      // });
       setTriggered(!triggered);
     } catch (error) {
       console.error("Error updating expense:", error.message);
@@ -444,14 +410,14 @@ const handleCancelSub=()=>{
   }
 
   const handleDelete =async(subscriptionID)=>{
-    const response = await fetch(`http://localhost:3500/subscriptions/${subscriptionID}`,{
-    method:"DELETE",
-    headers:{
-        "Content-Type":"application/json",
-        "authorization":`Bearer ${session?.user.accessToken}`
-    },
-  })
-  console.log(response.json())
+    const response = await deleteSubscription(subscriptionID)
+  //   const response = await fetch(`http://localhost:3500/subscriptions/${subscriptionID}`,{
+  //   method:"DELETE",
+  //   headers:{
+  //       "Content-Type":"application/json",
+  //       "authorization":`Bearer ${session?.user.accessToken}`
+  //   },
+  // })
   setEditedValue(null)
   setTriggered(!triggered);
   }
@@ -526,48 +492,6 @@ const handleCancelSub=()=>{
             </div>
             </div>
         </div>
-
-    // console.log("renderEdit")
-    // const cellValue = editedValue[columnKey];
-  
-    // switch (columnKey) {
-    //   case "category":
-    //     return (
-    //       <Dropdown showArrow radius="sm">
-    //         <DropdownTrigger>
-    //           <Button variant="bordered">{cellValue}</Button>
-    //         </DropdownTrigger>
-  
-    //         <DropdownMenu aria-label="Categories" items={editColumns} onAction={(key) => handleAction(key)}>
-    //           {categoryItems.map((item) => (
-    //             <DropdownItem key={item.key}>{item.category}</DropdownItem>
-    //           ))}
-  
-    //           <DropdownSection>
-    //             <DropdownItem key="new_project" endContent={<Plus className="text-large" />}>
-    //               New Project
-    //             </DropdownItem>
-    //           </DropdownSection>
-    //         </DropdownMenu>
-    //       </Dropdown>
-    //     );
-  
-    //   default:
-    //     return (
-    //       <Input
-    //         isClearable
-    //         size="xs"
-    //         className="border-blue-600 rounded-sm"
-    //         value={cellValue}
-    //         onChange={(e) =>
-    //           setEditedValue({
-    //             ...editedValue,
-    //             [columnKey]: e.target.value,
-    //           })
-    //         }
-    //       />
-    //     );
-    // }
   )
   
   const handleAddNew = ()=>{

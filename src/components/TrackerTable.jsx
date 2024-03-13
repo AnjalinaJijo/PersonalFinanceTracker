@@ -4,6 +4,9 @@ import React from "react";
 import { v4 as uuidv4 } from 'uuid';
 import { useSession } from "next-auth/react"
 import { useMemo, useState, useEffect } from "react";
+
+import {DateFormatter} from "./DateFormatter"
+
 import "react-datepicker/dist/react-datepicker.css"; // Import the styles
 import {
   Table,
@@ -29,7 +32,9 @@ import {columns} from "./data.jsx";
 import {RenderCell} from "./RenderCell";
 import {RenderEditing} from "./RenderEditing.jsx";
 
-import getExpense from "../lib/getExpense"
+import getExpense from "../lib/fetchFunctions/expense/getExpense"
+import postExpense from "@/lib/fetchFunctions/expense/postExpense";
+import deleteExpense from "@/lib/fetchFunctions/expense/deleteExpense";
 
 
 export default function TrackerTable() {
@@ -74,17 +79,12 @@ export default function TrackerTable() {
   const { data: session } = useSession()
   // console.log(session)
 
-      // Get the current local date
-      const currentDate = new Date();
-      const year = currentDate.getFullYear();
-      const month = String(currentDate.getMonth() + 1).padStart(2, "0");
-      const day = String(currentDate.getDate()).padStart(2, "0");
-      const formattedDate = `${year}-${month}-${day}`;
+  // Get the current local date
+  const currentDate = new Date();
+  //call the DateFormatter function yyyy-mm-dd
+  const formattedDate = DateFormatter()
 
-
-
-
-        //for editing
+    //for editing
   // const [isEditing, setIsEditing] = useState(false);
   const [currentID, setCurrentID] = useState(null);
   const [editedValue, setEditedValue] = useState({"ExpenseID":null, "Date": formattedDate, "Activity": "", "Category":"", "Amount": 0, "Description": "" });
@@ -97,7 +97,6 @@ export default function TrackerTable() {
       try {
         const getResponse = await getExpense();
         setGetData(getResponse);
-        console.log('response',getResponse)
       } catch (error) {
         console.error("Error fetching expenses:", error.message);
       }
@@ -147,34 +146,30 @@ const handleSave = async(e) => {
   }
 
   // Add logic to save the new row data to your data source
-  console.log(session?.user.id)
-  console.log(editing)
-  const ExpenseData = await fetch(`http://localhost:3500/expense/${session?.user.id}`,{
-    method:"POST",
-    headers:{
-        "Content-Type":"application/json",
-        "authorization":`Bearer ${session?.user.accessToken}`
-    },
-    body:JSON.stringify(editing), 
-  })
-  const expense = await ExpenseData.json()
-  console.log(expense)
+  const expense = await postExpense(editing)
+  // const ExpenseData = await fetch(`http://localhost:3500/expense/${session?.user.id}`,{
+  //   method:"POST",
+  //   headers:{
+  //       "Content-Type":"application/json",
+  //       "authorization":`Bearer ${session?.user.accessToken}`
+  //   },
+  //   body:JSON.stringify(editing), 
+  // })
   //   // After saving, reset the editing state to null
     setEditing(null);
     setTriggered(!triggered);
     setPopupVisible(false)
   };
 
-  const DeleteExpense = async (e,expenseID)=>{
-    e.preventDefault()
-    const response = await fetch(`http://localhost:3500/expense/${expenseID}`,{
-    method:"DELETE",
-    headers:{
-        "Content-Type":"application/json",
-        "authorization":`Bearer ${session?.user.accessToken}`
-    },
-  })
-  console.log(response.json())
+  const DeleteExpense = async (expenseID)=>{
+    const response = await deleteExpense(expenseID)
+  //   const response = await fetch(`http://localhost:3500/expense/${expenseID}`,{
+  //   method:"DELETE",
+  //   headers:{
+  //       "Content-Type":"application/json",
+  //       "authorization":`Bearer ${session?.user.accessToken}`
+  //   },
+  // })
   setTriggered(!triggered);
 
   }
@@ -184,14 +179,15 @@ const handleSave = async(e) => {
   const handleUpdate = async(expenseID)=>{
     try {
       // Perform PUT request with the updated expense data
-      const response = await fetch(`http://localhost:3500/expense/${expenseID}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "authorization": `Bearer ${session?.user.accessToken}`,
-        },
-        body: JSON.stringify(editedValue),
-      });
+      const response  = await updateExpense(expenseID,editedValue)
+      // const response = await fetch(`http://localhost:3500/expense/${expenseID}`, {
+      //   method: "PUT",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //     "authorization": `Bearer ${session?.user.accessToken}`,
+      //   },
+      //   body: JSON.stringify(editedValue),
+      // });
       setTriggered(!triggered);
     } catch (error) {
       console.error("Error updating expense:", error.message);

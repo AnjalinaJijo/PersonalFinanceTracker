@@ -1,8 +1,8 @@
 'use server'
 import { getServerSession } from "next-auth";
-import { authOptions } from "../app/api/auth/[...nextauth]/route.js";
+import { authOptions } from "../../app/api/auth/[...nextauth]/route.js";
 
-export default async function getExpense(){
+export default async function getIncome(){
     const session = await getServerSession(authOptions);
 
     const response = await fetch(`http://localhost:3500/income/${session?.user.id}`,{
@@ -18,7 +18,7 @@ export default async function getExpense(){
         throw new Error('failed to fetch income')
     }
 
-    console.log(response)
+    // console.log(response)
     return response.json()
 }
 

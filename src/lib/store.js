@@ -2,6 +2,8 @@ import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./features/auth/authSlice"
 import expenseReducer from "./features/expense/expenseSlice"
 import incomeReducer from "./features/income/incomeSlice"
+import goalReducer from "./features/goal/goalSlice"
+import subscriptionReducer from "./features/subscription/subscriptionSlice"
 
 
 
@@ -16,6 +18,8 @@ export const makeStore = ()=>{
             auth:authReducer,
             expense:expenseReducer,
             income:incomeReducer,
+            goal:goalReducer,
+            subscription:subscriptionReducer,
         },
         middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({

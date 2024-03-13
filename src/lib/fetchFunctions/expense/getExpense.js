@@ -1,6 +1,6 @@
 'use server'
 import { getServerSession } from "next-auth";
-import { authOptions } from "../app/api/auth/[...nextauth]/route.js";
+import { authOptions } from "../../../app/api/auth/[...nextauth]/route.js";
 
 //redux store
 import { makeStore } from "@/lib/store";
@@ -32,29 +32,3 @@ export default async function getExpense(){
 }
 
 
-
-// Function to get static props with ISR
-export async function getStaticProps() {
-    try {
-      // Fetch expense data using the getExpense function
-      const expenseData = await getExpense();
-  
-      // Return the expense data as props
-      return {
-        props: {
-          expenseData,
-        },
-        // Revalidate the page every 10 seconds (adjust as needed)
-        revalidate: 10, // In seconds
-      };
-    } catch (error) {
-      console.error('Error in getStaticProps:', error.message);
-      return {
-        props: {
-          expenseData: [],
-        },
-        // Revalidate the page every 10 seconds (adjust as needed)
-        revalidate: 10, // In seconds
-      };
-    }
-  }
