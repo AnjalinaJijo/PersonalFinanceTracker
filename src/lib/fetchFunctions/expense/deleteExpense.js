@@ -18,7 +18,7 @@ export default async function deleteExpense(ExpenseID){
         throw new Error('failed to delete expenses')
     }
 
-    const res = await deleteResponse.json();
+    const res = await deleteResponse();
     // console.log("Fetched Expense",expenseData)
     // Dispatch the result to the Redux store
     // store.dispatch(setExpenseArray(expenseData));
