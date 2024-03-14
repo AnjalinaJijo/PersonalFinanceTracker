@@ -6,14 +6,22 @@ import {EditIcon} from "./Icons";
 import {DeleteIcon} from "./Icons";
 import {SaveIcon} from "./Icons";
 
+//redux
+import {setEditedValue, selectEditedValue} from "@/lib/features/expense/expenseSlice";
+import {useAppSelector, useAppDispatch } from "@/lib/hooks"
+
 import {Input, Button} from "@nextui-org/react";
+
+import deleteExpense from "@/lib/fetchFunctions/expense/deleteExpense";
+import updateExpense from "@/lib/fetchFunctions/expense/updateExpense";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css"; // Import the styles
 
-export const RenderCell =(expense, columnKey, DeleteExpense, handleUpdate,currentID, setCurrentID,editedValue,setEditedValue) => {
+const RenderCell =({expense, columnKey, setTriggered,triggered,currentID, setCurrentID}) => {
 
-  console.log('expense',expense)
+  // console.log('expense',expense)
+ 
 
    // Get the current local date
    const currentDate = new Date();
@@ -22,22 +30,33 @@ export const RenderCell =(expense, columnKey, DeleteExpense, handleUpdate,curren
    const day = String(currentDate.getDate()).padStart(2, "0");
    const formattedDate = `${year}-${month}-${day}`;
 
-
+   const dispatch = useAppDispatch();
+  const editedValue = useAppSelector(selectEditedValue)
 
   const startEditing = () => {
     setCurrentID(expense.ExpenseID);
-    setEditedValue(expense);
+    dispatch(setEditedValue(expense))
+    // setEditedValue(expense);
   };
 
   const cancelEditing = () => {
     setCurrentID(null);
-    setEditedValue(expense);
+    dispatch(setEditedValue(expense))
+    // setEditedValue(expense);
   };
 
-  const saveEditing = () => {
+  const saveEditing = async(expenseID) => {
     setCurrentID(null);
     // Perform PUT request or update logic here
-    handleUpdate(expense.ExpenseID, columnKey);
+    // handleUpdate(expense.ExpenseID, columnKey);
+    try {
+      // Perform PUT request with the updated expense data
+      console.log("expense ID",expenseID)
+      const response  = await updateExpense(expenseID,editedValue)
+      setTriggered(!triggered);
+    } catch (error) {
+      console.error("Error updating expense:", error.message);
+    }
   };
 
 
@@ -55,6 +74,13 @@ export const RenderCell =(expense, columnKey, DeleteExpense, handleUpdate,curren
     day: "2-digit",
   }
 
+
+  const DeleteExpense = async (expenseID)=>{
+    const response = await deleteExpense(expenseID)
+    setTriggered(!triggered);
+
+  }
+
     switch (columnKey) {
       case "Date":
         return (
@@ -62,10 +88,14 @@ export const RenderCell =(expense, columnKey, DeleteExpense, handleUpdate,curren
           {currentID===expense.ExpenseID ?( <div><DatePicker
             selected={new Date(cellValue)}
             onChange={(date) =>
-              setEditedValue({
+              dispatch(setEditedValue({
                 ...editedValue,
                 [columnKey]: new Date(date),
-              })
+              }))
+              // setEditedValue({
+              //   ...editedValue,
+              //   [columnKey]: new Date(date),
+              // })
             }
             className="w-full"
             popperPlacement="auto"
@@ -87,7 +117,12 @@ export const RenderCell =(expense, columnKey, DeleteExpense, handleUpdate,curren
               size='xs'
               type="text"
               value={editedValue[columnKey]}
-              onChange={(e) => setEditedValue({ ...editedValue, [columnKey]: e.target.value })}
+              onChange={(e) =>
+                dispatch(setEditedValue({
+                  ...editedValue,
+                  [columnKey]: e.target.value
+                }))
+              }
             />
           ) : (
             <div>{expense[columnKey]}</div>
@@ -113,7 +148,12 @@ export const RenderCell =(expense, columnKey, DeleteExpense, handleUpdate,curren
               size='xs'
               type="text"
               value={editedValue[columnKey]}
-              onChange={(e) => setEditedValue({ ...editedValue, [columnKey]: e.target.value })}
+              onChange={(e) =>
+                dispatch(setEditedValue({
+                  ...editedValue,
+                  [columnKey]: e.target.value
+                }))
+              }
             />
           ) : (
             <div>{expense[columnKey]}</div>
@@ -126,7 +166,12 @@ export const RenderCell =(expense, columnKey, DeleteExpense, handleUpdate,curren
               size='xs'
               type="text"
               value={editedValue[columnKey]}
-              onChange={(e) => setEditedValue({ ...editedValue, [columnKey]: e.target.value })}
+              onChange={(e) =>
+                dispatch(setEditedValue({
+                  ...editedValue,
+                  [columnKey]: e.target.value
+                }))
+              }
             />
           ) : (
             <div>{expense[columnKey]}</div>
@@ -139,7 +184,7 @@ export const RenderCell =(expense, columnKey, DeleteExpense, handleUpdate,curren
            <>
 
 <Tooltip color="green" content="Save changes">
-              <span onClick={saveEditing} className="text-lg text-green-600 cursor-pointer active:opacity-50">
+              <span onClick={()=>saveEditing(expense.expenseID)} className="text-lg text-green-600 cursor-pointer active:opacity-50">
                 <SaveIcon />
               </span>
             </Tooltip>
@@ -170,7 +215,7 @@ export const RenderCell =(expense, columnKey, DeleteExpense, handleUpdate,curren
               </Tooltip>
               <Tooltip color="danger" content="Delete user">
                 <span
-                  onClick={(e) => DeleteExpense(e, expense.ExpenseID)}
+                  onClick={() => DeleteExpense(expense.ExpenseID)}
                   className="text-lg text-danger cursor-pointer active:opacity-50"
                 >
                   <DeleteIcon />
@@ -185,3 +230,6 @@ export const RenderCell =(expense, columnKey, DeleteExpense, handleUpdate,curren
     }
   
   };
+
+
+  export default RenderCell

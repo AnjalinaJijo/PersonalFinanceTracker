@@ -29,12 +29,13 @@ import {
 } from "@nextui-org/react";
 import {PlusIcon} from "./Icons";
 import {columns} from "./data.jsx";
-import {RenderCell} from "./RenderCell";
+import RenderCell from "./RenderCell";
 import {RenderEditing} from "./RenderEditing.jsx";
 
 import getExpense from "../lib/fetchFunctions/expense/getExpense"
 import postExpense from "@/lib/fetchFunctions/expense/postExpense";
 import deleteExpense from "@/lib/fetchFunctions/expense/deleteExpense";
+import updateExpense from "@/lib/fetchFunctions/expense/updateExpense";
 
 
 export default function TrackerTable() {
@@ -138,8 +139,7 @@ const handleAddNew =(e)=>{
   setEditing({ "ExpenseID":newKey, "Date": formattedDate, "Activity": "", "Category":"", "Amount": 0, "Description": "" });
   console.log(editing)
 }
-const handleSave = async(e) => {
-  e.preventDefault()
+const handleSave = async() => {
   if (editing?.Activity==="" || editing?.Category==="") {
     setPopupVisible(true);
     return;
@@ -161,38 +161,38 @@ const handleSave = async(e) => {
     setPopupVisible(false)
   };
 
-  const DeleteExpense = async (expenseID)=>{
-    const response = await deleteExpense(expenseID)
-  //   const response = await fetch(`http://localhost:3500/expense/${expenseID}`,{
-  //   method:"DELETE",
-  //   headers:{
-  //       "Content-Type":"application/json",
-  //       "authorization":`Bearer ${session?.user.accessToken}`
-  //   },
-  // })
-  setTriggered(!triggered);
+  // const DeleteExpense = async (expenseID)=>{
+  //   const response = await deleteExpense(expenseID)
+  // //   const response = await fetch(`http://localhost:3500/expense/${expenseID}`,{
+  // //   method:"DELETE",
+  // //   headers:{
+  // //       "Content-Type":"application/json",
+  // //       "authorization":`Bearer ${session?.user.accessToken}`
+  // //   },
+  // // })
+  // setTriggered(!triggered);
 
-  }
+  // }
 
 
   //editing present data
-  const handleUpdate = async(expenseID)=>{
-    try {
-      // Perform PUT request with the updated expense data
-      const response  = await updateExpense(expenseID,editedValue)
-      // const response = await fetch(`http://localhost:3500/expense/${expenseID}`, {
-      //   method: "PUT",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //     "authorization": `Bearer ${session?.user.accessToken}`,
-      //   },
-      //   body: JSON.stringify(editedValue),
-      // });
-      setTriggered(!triggered);
-    } catch (error) {
-      console.error("Error updating expense:", error.message);
-    }
-  }
+  // const handleUpdate = async(expenseID)=>{
+  //   try {
+  //     // Perform PUT request with the updated expense data
+  //     const response  = await updateExpense(expenseID,editedValue)
+  //     // const response = await fetch(`http://localhost:3500/expense/${expenseID}`, {
+  //     //   method: "PUT",
+  //     //   headers: {
+  //     //     "Content-Type": "application/json",
+  //     //     "authorization": `Bearer ${session?.user.accessToken}`,
+  //     //   },
+  //     //   body: JSON.stringify(editedValue),
+  //     // });
+  //     setTriggered(!triggered);
+  //   } catch (error) {
+  //     console.error("Error updating expense:", error.message);
+  //   }
+  // }
 
 
 
@@ -275,7 +275,12 @@ const handleSave = async(e) => {
           {editing && editing.ExpenseID === item.ExpenseID ? (
            RenderEditing({editing,setEditing,columnKey,handleSave,isNewCategory,setIsNewCategory,categoryItems, setCategoryItems})
           ) : (
-            RenderCell(item,columnKey,DeleteExpense,handleUpdate,currentID,setCurrentID,editedValue,setEditedValue)
+            <RenderCell expense={item}
+              columnKey={columnKey}
+              setTriggered={setTriggered}
+              triggered={triggered}
+              currentID={currentID}
+              setCurrentID={setCurrentID} />
           )}
         </TableCell>
       )}
