@@ -1,16 +1,28 @@
 'use client'
 import React, {useState} from "react";
-import { Tooltip } from "@nextui-org/react";
+import {  Dropdown,
+  Tooltip,
+  DropdownTrigger,
+  Button,
+  DropdownItem,
+  DropdownMenu,
+  DropdownSection,
+  Input,
+ } from "@nextui-org/react";
 
 import {EditIcon} from "./Icons";
 import {DeleteIcon} from "./Icons";
-import {SaveIcon} from "./Icons";
+import {SaveIcon, Plus} from "./Icons";
 
 //redux
-import {setEditedValue, selectEditedValue} from "@/lib/features/expense/expenseSlice";
+import {setEditedValue, 
+  selectEditedValue,
+   selectFormattedCurrentDate,
+    setTriggered, selectTriggered,setEditItemID,selectEditItemID,
+  setCategoryItems,
+  selectCategoryItems,
+} from "@/lib/features/expense/expenseSlice";
 import {useAppSelector, useAppDispatch } from "@/lib/hooks"
-
-import {Input, Button} from "@nextui-org/react";
 
 import deleteExpense from "@/lib/fetchFunctions/expense/deleteExpense";
 import updateExpense from "@/lib/fetchFunctions/expense/updateExpense";
@@ -18,55 +30,42 @@ import updateExpense from "@/lib/fetchFunctions/expense/updateExpense";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css"; // Import the styles
 
-const RenderCell =({expense, columnKey, setTriggered,triggered,currentID, setCurrentID}) => {
+const RenderCell =({expense, columnKey}) => {
 
-  // console.log('expense',expense)
- 
-
-   // Get the current local date
-   const currentDate = new Date();
-   const year = currentDate.getFullYear();
-   const month = String(currentDate.getMonth() + 1).padStart(2, "0");
-   const day = String(currentDate.getDate()).padStart(2, "0");
-   const formattedDate = `${year}-${month}-${day}`;
-
-   const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch();
   const editedValue = useAppSelector(selectEditedValue)
+  const triggered = useAppSelector(selectTriggered)
+  const editItemID = useAppSelector(selectEditItemID)
+  const categoryItems = useAppSelector(selectCategoryItems);
+  
+
 
   const startEditing = () => {
-    setCurrentID(expense.ExpenseID);
+    dispatch(setEditItemID(expense.ExpenseID))
     dispatch(setEditedValue(expense))
-    // setEditedValue(expense);
   };
 
   const cancelEditing = () => {
-    setCurrentID(null);
+    dispatch(setEditItemID(null))
     dispatch(setEditedValue(expense))
-    // setEditedValue(expense);
   };
 
-  const saveEditing = async(expenseID) => {
-    setCurrentID(null);
+  const saveEditing = async() => {
     // Perform PUT request or update logic here
     // handleUpdate(expense.ExpenseID, columnKey);
     try {
       // Perform PUT request with the updated expense data
-      console.log("expense ID",expenseID)
-      const response  = await updateExpense(expenseID,editedValue)
-      setTriggered(!triggered);
+      const response  = await updateExpense(editItemID,editedValue)
     } catch (error) {
       console.error("Error updating expense:", error.message);
     }
+    dispatch(setEditItemID(null))
+    dispatch(setTriggered(!triggered));
   };
 
-
-
-  // if (!expense) {
-  //   // Handle the case where expense is undefined
-  //   return <div>Error: Expense data is missing</div>;
-  // }
-
-    const cellValue = expense[columnKey];
+  const cellValue = expense[columnKey];
+  console.log("cellValue",cellValue)
+  console.log("expense[columnKey]",expense[columnKey])
 
   const options={
     year: "numeric",
@@ -74,10 +73,14 @@ const RenderCell =({expense, columnKey, setTriggered,triggered,currentID, setCur
     day: "2-digit",
   }
 
+  const handleAction = (key) => {
+      dispatch(setEditedValue({ ...editedValue, [columnKey]: key }));
+  };
+
 
   const DeleteExpense = async (expenseID)=>{
     const response = await deleteExpense(expenseID)
-    setTriggered(!triggered);
+    dispatch(setTriggered(!triggered));
 
   }
 
@@ -85,17 +88,14 @@ const RenderCell =({expense, columnKey, setTriggered,triggered,currentID, setCur
       case "Date":
         return (
           <>
-          {currentID===expense.ExpenseID ?( <div><DatePicker
-            selected={new Date(cellValue)}
+          {editItemID===expense.ExpenseID ?(
+             <div><DatePicker
+            selected={new Date(editedValue[columnKey])}
             onChange={(date) =>
               dispatch(setEditedValue({
                 ...editedValue,
                 [columnKey]: new Date(date),
               }))
-              // setEditedValue({
-              //   ...editedValue,
-              //   [columnKey]: new Date(date),
-              // })
             }
             className="w-full"
             popperPlacement="auto"
@@ -112,7 +112,7 @@ const RenderCell =({expense, columnKey, setTriggered,triggered,currentID, setCur
         );
       case "Activity":
         return (
-          (currentID===expense.ExpenseID) ? (
+          (editItemID===expense.ExpenseID) ? (
             <Input
               size='xs'
               type="text"
@@ -130,20 +130,48 @@ const RenderCell =({expense, columnKey, setTriggered,triggered,currentID, setCur
         );
       case "Category":
         return (
-          currentID===expense.ExpenseID ? (
-            <Input
-              size='xs'
-              type="text"
-              value={editedValue[columnKey]}
-              onChange={(e) => setEditedValue({ ...editedValue, [columnKey]: e.target.value })}
-            />
+          (editItemID===expense.ExpenseID) ? (
+            <Dropdown showArrow radius="sm">
+            <DropdownTrigger>
+              <Button variant="bordered">{editedValue[columnKey]}</Button>
+            </DropdownTrigger>
+            <DropdownMenu
+              aria-label="Categories"
+              items={categoryItems}
+              onAction={(key) => handleAction(key)}
+            >
+              {categoryItems.map((item) => (
+                <DropdownItem
+                  key={item.key}
+                  // onClick={() => handleAction(item.key)}
+                >
+                  {item.category}
+                </DropdownItem>
+              ))}
+
+              <DropdownSection>
+                <DropdownItem
+                  key="new_project"
+                  endContent={<Plus className="text-large" />}
+                >
+                  New Project
+                </DropdownItem>
+              </DropdownSection>
+            </DropdownMenu>
+          </Dropdown>
+            // <Input
+            //   size='xs'
+            //   type="text"
+            //   value={editedValue[columnKey]}
+            //   onChange={(e) => setEditedValue({ ...editedValue, [columnKey]: e.target.value })}
+            // />
           ) : (
             <div>{expense[columnKey]}</div>
           )
         );
       case "Amount":
         return (
-          currentID===expense.ExpenseID ? (
+          editItemID===expense.ExpenseID ? (
             <Input
               size='xs'
               type="text"
@@ -161,7 +189,7 @@ const RenderCell =({expense, columnKey, setTriggered,triggered,currentID, setCur
         );
       case "Description":
         return (
-          currentID===expense.ExpenseID ? (
+          editItemID===expense.ExpenseID ? (
             <Input
               size='xs'
               type="text"
@@ -180,11 +208,10 @@ const RenderCell =({expense, columnKey, setTriggered,triggered,currentID, setCur
       case "Actions":
         return (
           <div className="relative flex items-center gap-2">
-          {currentID===expense.ExpenseID ? (
+          {editItemID===expense.ExpenseID ? (
            <>
-
-<Tooltip color="green" content="Save changes">
-              <span onClick={()=>saveEditing(expense.expenseID)} className="text-lg text-green-600 cursor-pointer active:opacity-50">
+      <Tooltip color="green" content="Save changes">
+              <span onClick={saveEditing} className="text-lg text-green-600 cursor-pointer active:opacity-50">
                 <SaveIcon />
               </span>
             </Tooltip>
@@ -225,8 +252,6 @@ const RenderCell =({expense, columnKey, setTriggered,triggered,currentID, setCur
           )}
         </div>
         );
-      // default:
-      //   return {cellValue};
     }
   
   };

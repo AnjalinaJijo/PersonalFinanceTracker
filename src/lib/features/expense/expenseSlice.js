@@ -8,15 +8,61 @@ const expenseSlice = createSlice({
         monthlyExpense: [],
         categoryExpense: [],
         totalExpense: 0,
-        // formattedCurrentDate: DateFormatter(),
+        formattedCurrentDate: DateFormatter(),
         editedValue: {
             "ExpenseID": null,
-            "Date": "",
+            "Date": DateFormatter(),
             "Activity": "",
             "Category": "",
             "Amount": 0,
             "Description": ""
         },
+        triggered:false,
+        editItemID:null,
+        categoryItems:[
+            {
+              key:"Grocery",
+              category:"Grocery"
+            },
+            {
+              key:"Transport",
+              category:"Transport"
+            },
+            {
+              key:"Food",
+              category:"Food"
+            },
+             {
+              key:"HealthCare",
+              category:"HealthCare"
+            },
+             {
+              key:"SkinCare",
+              category:"SkinCare"
+            },
+             {
+              key:"Entertainment",
+              category:"Entertainment"
+            },
+             {
+              key:"Restaurant",
+              category:"Restaurant"
+            },
+             {
+              key:"Vacation",
+              category:"Vacation"
+            },
+             {
+              key:"Education",
+              category:"Education"
+            },
+            {
+              key:"Other",
+              category:"Other"
+            }
+          ],
+          addNew:null,
+          popupVisible:false,
     },
     reducers: {
         setExpenseArray: (state, action) => {
@@ -39,10 +85,26 @@ const expenseSlice = createSlice({
             state.editedValue.Amount = action.payload.Amount;
             state.editedValue.Description = action.payload.Description;
         },
+        setTriggered: (state, action) => {
+            state.triggered = action.payload;
+        },
+        setEditItemID: (state, action) => {
+            state.editItemID = action.payload;
+        },
+        setCategoryItems: (state, action) => {
+            state.categoryItems.push(action.payload);
+        },
+        setAddNew: (state, action) => {
+            state.addNew = action.payload;
+        },
+        setPopupVisible: (state, action) => {
+            state.popupVisible = action.payload;
+        },
+        
     },
 });
 
-export const { setExpenseArray, setMonthlyExpense, setCategoryExpense, setTotalExpense, setEditedValue } = expenseSlice.actions;
+export const { setExpenseArray, setMonthlyExpense, setCategoryExpense, setTotalExpense, setEditedValue,setTriggered, setEditItemID, setCategoryItems, setAddNew, setPopupVisible } = expenseSlice.actions;
 
 export default expenseSlice.reducer;
 
@@ -51,3 +113,9 @@ export const selectMonthlyExpense = (state) => state.expense.monthlyExpense;
 export const selectCategoryExpense = (state) => state.expense.categoryExpense;
 export const selectTotalExpense = (state) => state.expense.totalExpense;
 export const selectEditedValue = (state) => state.expense.editedValue;
+export const selectFormattedCurrentDate = (state) => state.expense.formattedCurrentDate;
+export const selectTriggered = (state) => state.expense.triggered;
+export const selectEditItemID = (state) => state.expense.editItemID;
+export const selectCategoryItems = (state) => state.expense.categoryItems;
+export const selectAddNew = (state) => state.expense.addNew;
+export const selectPopupVisible = (state) => state.expense.selectPopupVisible;
