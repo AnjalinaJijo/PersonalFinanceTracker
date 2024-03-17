@@ -8,11 +8,13 @@ import deleteSubscription from "../lib/fetchFunctions/subscription/deleteSubscri
 import deleteExpense from "../lib/fetchFunctions/expense/deleteExpense"
 import postExpense from "../lib/fetchFunctions/expense/postExpense"
 
+
 import { useSession } from "next-auth/react"
 import { getSession } from "next-auth/react";
 
 //redux
 import { selectSubscriptionArray, setSubscriptionArray } from "@/lib/features/subscription/subscriptionSlice";
+import {setCategoryItems,selectCategoryItems, selectFormattedCurrentDate,setCategoryCurrMonthExpense,selectCategoryCurrMonthExpense,} from "@/lib/features/expense/expenseSlice";
 import {useAppSelector, useAppDispatch } from "@/lib/hooks"
 
 import { PlusIcon } from "./Icons"
@@ -32,6 +34,9 @@ const { data: session } = useSession()
 
 const dispatch = useAppDispatch();
 const subData = useAppSelector(selectSubscriptionArray)
+const categoryItems = useAppSelector(selectCategoryItems);
+const formattedDate = useAppSelector(selectFormattedCurrentDate);
+
 
 const [triggered, setTriggered] = useState(false);
 const [addNewClicked,setAddNewClicked] = useState(false)
@@ -57,44 +62,7 @@ const editColumns = [
     // {name: "Date", uid: "date"},
   ];
 
-
- 
-
-
-const [categoryItems, setCategoryItems] = useState(
-    [
-      {
-        key:"Grocery",
-        category:"Grocery"
-      },
-      {
-        key:"Transport",
-        category:"Transport"
-      },
-      {
-        key:"Food",
-        category:"Food"
-      },
-       {
-        key:"HealthCare",
-        category:"HealthCare"
-      },
-       {
-        key:"Entertainment",
-        category:"Entertainment"
-      },
-       {
-        key:"Other",
-        category:"Other"
-      }
-    ]
-
-  );
-
-
      const currentDate = new Date();
-     const formattedDate = DateFormatter();
-
 
     // Get the current month and year for reseting status to unpaid every month
     const currentMonth = currentDate.getMonth() + 1;  // Months are 0-indexed

@@ -1,10 +1,10 @@
 'use client'
-import getIncome from "../lib/fetchFunctions/getIncome"
+import getIncome from "../lib/fetchFunctions/income/getIncome"
 import getExpense from "../lib/fetchFunctions/expense/getExpense"
 import {useState,useEffect} from "react";
 
 //redux
-import { selectExpenseArray, setExpenseArray, selectMonthlyExpense, setMonthlyExpense, setCategoryExpense, selectCategoryExpense, setTotalExpense, selectTotalExpense } from "@/lib/features/expense/expenseSlice";
+import { selectExpenseArray, setExpenseArray, selectMonthlyExpense, setMonthlyExpense, setCategoryExpense, selectCategoryExpense, setTotalExpense, selectTotalExpense,setCategoryCurrMonthExpense,selectCategoryCurrMonthExpense } from "@/lib/features/expense/expenseSlice";
 import { selectIncomeArray, setIncomeArray, selectMonthlyIncome, setMonthlyIncome, setTotalIncome, selectTotalIncome } from "@/lib/features/income/incomeSlice";
 import {useAppSelector, useAppDispatch } from "@/lib/hooks"
 
@@ -27,9 +27,8 @@ export  function Operations() {
     const monthlyExpense = useAppSelector(selectMonthlyExpense)
     const monthlyIncome = useAppSelector(selectMonthlyIncome)
     const totalExpenseCategory = useAppSelector(selectCategoryExpense)
-
-    // const [getIncomeData, setGetIncomeData] = useState([]);
-    // const [getExpenseData, setGetExpenseData] = useState([]);
+    const categoryCurrMonthExpense = useAppSelector(selectCategoryCurrMonthExpense);
+    
     const monthlyData={
     "Jan":0,
     "Feb":0,
@@ -43,8 +42,6 @@ export  function Operations() {
     "Oct":0,
     "Nov":0,
     "Dec":0}
-    // const [monthlyExpense, setMonthlyExpense] = useState(monthlyData);
-    // const [monthlyIncome, setMonthlyIncome] = useState(monthlyData);
     const months= ["Jan",
     "Feb",
     "Mar",
@@ -57,11 +54,8 @@ export  function Operations() {
     "Oct",
     "Nov",
     "Dec"]
-
-    // const [totalExpenseCategory,setTotalExpenseCategory]= useState({})
     const [monthlyExpenseCategory,setMonthlyExpenseCategory]= useState({})
-    
-    const [duration,setDuration]= useState("0")
+
     const [yearData,setYearData] = useState([{key:2024,value:2024},])
 
     const [lineYear,setLineYear] = useState(2024)
@@ -136,9 +130,6 @@ export  function Operations() {
           }
         });
       
-        // console.log('monthly expense', newMonthlyExpense);
-        // console.log('monthly income', newMonthlyIncome);
-      
         // Set state once after the loop
         if (name === 'expense') {
           // setMonthlyExpense(newMonthlyExpense);
@@ -193,7 +184,7 @@ export  function Operations() {
         // console.log('totalMOOOO',newMonthlyCat)
         // setTotalExpenseCategory(newTotalCat)
         dispatch(setCategoryExpense(newTotalCat))
-        setMonthlyExpenseCategory(newMonthlyCat)
+        dispatch(setCategoryCurrMonthExpense(newMonthlyCat))
       };
 
       const calculateMonthlyData = ()=>{
@@ -255,7 +246,7 @@ export  function Operations() {
           <h3>${totalIncome}</h3>
         </div>
         <div className="p-5 row-span-2 flex flex-col items-center bg-SavoyBlue text-xl rounded-xl">
-          <Goals monthlyExpenseCategory={monthlyExpenseCategory}/>
+          <Goals/>
         </div>
         <div className="h-60 p-5 flex flex-col justify-center items-center bg-Purple text-xl rounded-xl">
           <h1>Upcomming</h1>

@@ -17,7 +17,6 @@ import { Plus } from "./Icons";
 
 //redux
 import {
-  selectFormattedCurrentDate,
   setTriggered,
   selectTriggered,
   selectAddNew,
@@ -48,7 +47,7 @@ const RenderEditing = ({ columnKey }) => {
     }
 
     // Add logic to save the new row data to your data source
-    const expense = await postExpense(editing);
+    const expense = await postExpense(addNew);
     //   // After saving, reset the editing state to null
     dispatch(setAddNew(null));
     dispatch(setTriggered(!triggered));
@@ -56,15 +55,9 @@ const RenderEditing = ({ columnKey }) => {
   };
 
   const cellValue = addNew[columnKey];
-  // const [isNewProject, setNewProject] = useState(false);
 
   const handleAction = (key) => {
-    // if (key === "new_project") {
-    //   setIsNewCategory(true);
-    //   dispatch(setEditing({ ...editing, [columnKey]: "" }));
-    // } else {
       dispatch(setAddNew({ ...addNew, [columnKey]: key }));
-    // }
   };
 
   const handleDrop = () => {
@@ -101,17 +94,6 @@ const RenderEditing = ({ columnKey }) => {
     case "Category":
       return (
         <div>
-          {/* {isNewCategory ? (
-            <Input
-              value={cellValue}
-              onChange={(e) =>
-                dispatch(
-                  setEditing({ ...editing, [columnKey]: e.target.value })
-                )
-              }
-              onBlur={handleDrop}
-            />
-          ) : ( */}
             <Dropdown showArrow radius="sm">
               <DropdownTrigger>
                 <Button variant="bordered">{cellValue}</Button>
@@ -124,7 +106,6 @@ const RenderEditing = ({ columnKey }) => {
                 {categoryItems.map((item) => (
                   <DropdownItem
                     key={item.key}
-                    // onClick={() => handleAction(item.key)}
                   >
                     {item.category}
                   </DropdownItem>
@@ -140,7 +121,6 @@ const RenderEditing = ({ columnKey }) => {
                 </DropdownSection>
               </DropdownMenu>
             </Dropdown>
-          {/* )}  */}
         </div>
       );
 

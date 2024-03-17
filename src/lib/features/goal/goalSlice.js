@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 
 const goalSlice = createSlice({
     name:'goal',
-    initialState:{goalArray:[]},
+    initialState:{goalArray:[],},
     reducers:{
         setGoalArray: (state, action) => {
             // console.log('inside Goal Array',action.payload)

@@ -7,6 +7,7 @@ const expenseSlice = createSlice({
         expenseArray: [],
         monthlyExpense: [],
         categoryExpense: [],
+        categoryCurrMonthExpense: [],
         totalExpense: 0,
         formattedCurrentDate: DateFormatter(),
         editedValue: {
@@ -63,6 +64,7 @@ const expenseSlice = createSlice({
           ],
           addNew:null,
           popupVisible:false,
+          
     },
     reducers: {
         setExpenseArray: (state, action) => {
@@ -73,6 +75,9 @@ const expenseSlice = createSlice({
         },
         setCategoryExpense: (state, action) => {
             state.categoryExpense = action.payload;
+        },
+        setCategoryCurrMonthExpense: (state, action) => {
+            state.categoryCurrMonthExpense = action.payload;
         },
         setTotalExpense: (state, action) => {
             state.totalExpense = action.payload;
@@ -104,7 +109,7 @@ const expenseSlice = createSlice({
     },
 });
 
-export const { setExpenseArray, setMonthlyExpense, setCategoryExpense, setTotalExpense, setEditedValue,setTriggered, setEditItemID, setCategoryItems, setAddNew, setPopupVisible } = expenseSlice.actions;
+export const { setExpenseArray, setMonthlyExpense, setCategoryExpense, setTotalExpense, setEditedValue,setTriggered, setEditItemID, setCategoryItems, setAddNew, setPopupVisible, setCategoryCurrMonthExpense } = expenseSlice.actions;
 
 export default expenseSlice.reducer;
 
@@ -119,3 +124,4 @@ export const selectEditItemID = (state) => state.expense.editItemID;
 export const selectCategoryItems = (state) => state.expense.categoryItems;
 export const selectAddNew = (state) => state.expense.addNew;
 export const selectPopupVisible = (state) => state.expense.selectPopupVisible;
+export const selectCategoryCurrMonthExpense = (state) => state.expense.categoryCurrMonthExpense;

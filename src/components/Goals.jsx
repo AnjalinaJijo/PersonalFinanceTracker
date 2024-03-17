@@ -2,78 +2,39 @@ import { useEffect,useState } from "react"
 
 import {PlusIcon} from "./Icons";
 import {Plus} from "./Icons";
+import {DeleteIcon} from "./Icons";
 import {Button,Tooltip,Slider,Input,Dropdown,DropdownItem,DropdownMenu,DropdownSection,DropdownTrigger,Progress} from "@nextui-org/react";
 
 //redux
 import { selectGoalArray, setGoalArray } from "@/lib/features/goal/goalSlice";
+import {setCategoryItems,selectCategoryItems, selectFormattedCurrentDate,setCategoryCurrMonthExpense,selectCategoryCurrMonthExpense,} from "@/lib/features/expense/expenseSlice";
 import {useAppSelector, useAppDispatch } from "@/lib/hooks"
 
-import { useSession } from "next-auth/react"
-import { getSession } from "next-auth/react";
-
-import getGoals from "../lib/fetchFunctions/getGoals"
+import getGoal from "../lib/fetchFunctions/goal/getGoal"
+import postGoal from "../lib/fetchFunctions/goal/postGoal"
+import updateGoal from "../lib/fetchFunctions/goal/updateGoal"
+import deleteGoal from "../lib/fetchFunctions/goal/deleteGoal"
 import {EditIcon} from "./Icons"
 
 
-const Goals = (monthlyExpenseCategory) => {
-
-
+const Goals = () => {
   const dispatch = useAppDispatch();
   const getGoalData = useAppSelector(selectGoalArray)
+  const categoryItems = useAppSelector(selectCategoryItems);
+  const formattedDate = useAppSelector(selectFormattedCurrentDate);
+  const categoryCurrMonthExpense = useAppSelector(selectCategoryCurrMonthExpense);
+
+
+
 
   const [addNewClicked,setAddNewClicked] = useState(false)
   const [GoalAmount,setGoalAmount] = useState(0)
   const [category,setCategory] = useState("Select New Goal")
 
   const [triggered, setTriggered] = useState(false);
-  // const [getGoalData, setGetGoalData] = useState([]);
   const [editing, setEditing] = useState(null);
-  // const [isNeg, setIsNeg] = useState(false);
-  // let diff=0;
   let excess=0;
   let isNeg=false
-
-
-
-  const [categoryItems, setCategoryItems] = useState(
-    [
-      {
-        key:"Grocery",
-        category:"Grocery"
-      },
-      {
-        key:"Transport",
-        category:"Transport"
-      },
-      {
-        key:"Food",
-        category:"Food"
-      },
-       {
-        key:"HealthCare",
-        category:"HealthCare"
-      },
-       {
-        key:"Other",
-        category:"Other"
-      }
-    ]
-
-  );
-
-  const { data: session } = useSession()
-     // Get the current local date
-     const currentDate = new Date();
-     const year = currentDate.getFullYear();
-     const month = String(currentDate.getMonth() + 1).padStart(2, "0");
-     const day = String(currentDate.getDate()).padStart(2, "0");
-     const formattedDate = `${year}-${month}-${day}`;
-
-
-
-// useEffect(()=>{
-
-// },[])
 
 const handleAddNew = ()=>{
   setAddNewClicked(true)
@@ -114,17 +75,11 @@ const handleEditSave = async (goal)=>{
   console.log("editing",editing)
   console.log("goal",goal)
   //Update
-  const latestSession = await getSession();
+  // const latestSession = await getSession();
   try {
     // Perform PUT request with the updated expense data
-    const response = await fetch(`http://localhost:3500/goals/${goal.GoalID}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "authorization": `Bearer ${latestSession?.user.accessToken}`,
-      },
-      body: JSON.stringify({"Category":editing.Category,"GoalAmount":editing.GoalAmount,"Date":editing.Date}),
-    });
+    const body= {"Category":editing.Category,"GoalAmount":editing.GoalAmount,"Date":editing.Date}
+    const response = await updateGoal(goal.GoalID,body)
     setTriggered(!triggered);
     setEditing(null)
   } catch (error) {
@@ -141,10 +96,8 @@ const handleEditCancel = ()=>{
 useEffect(() => {
   const fetchExpenses = async () => {
     try {
-      const getResponse = await getGoals();
+      const getResponse = await getGoal();
       dispatch(setGoalArray(getResponse))
-      // setGetGoalData(getResponse);
-      // console.log('Goals',getResponse)
     } catch (error) {
       console.error("Error fetching goals:", error.message);
     }
@@ -155,17 +108,9 @@ useEffect(() => {
 
 
 const handleGoal=async(e)=>{
+  const body = {"Date":formattedDate,"Category":category,"GoalAmount":GoalAmount}
+  const goal = await postGoal(body)
 
-  const GoalData = await fetch(`http://localhost:3500/goals/${session?.user.id}`,{
-    method:"POST",
-    headers:{
-        "Content-Type":"application/json",
-        "authorization":`Bearer ${session?.user.accessToken}`
-    },
-    body:JSON.stringify({"Date":formattedDate,"Category":category,"GoalAmount":GoalAmount}), 
-  })
-  const goal = await GoalData
-  // console.log("goal posted",goal)
   //   // After saving, reset the editing state to null
     setAddNewClicked(false)
     setTriggered(!triggered)
@@ -173,12 +118,24 @@ const handleGoal=async(e)=>{
 
 }
 
-// console.log("monthlyExpenseCategory",monthlyExpenseCategory)
+const DeleteGoal= async(GoalID) =>{
+  console.log("GoalID",GoalID)
+  const res = await deleteGoal(GoalID)
+  //   // After saving, reset the editing state to null
+    setAddNewClicked(false)
+    setTriggered(!triggered)
+    // setPopupVisible(false)
+
+}
+
+
+
+// console.log("categoryCurrMonthExpense",categoryCurrMonthExpense)
 
   return (
     <div className="m-5 w-full px-5">
        <div className="flex justify-center items-center">
-          <h1>Goal Progress</h1>
+          <h1>Goal Progress for this Month</h1>
           <div className="px-6">
           <Button onClick={handleAddNew} isIconOnly aria-label="Add Goals" className="bg-CarolinaBlue">
               <PlusIcon />
@@ -192,7 +149,7 @@ const handleGoal=async(e)=>{
           isNeg = false;
           const category = goal.Category;
           const goalValue = goal.GoalAmount;
-          const spending = monthlyExpenseCategory.monthlyExpenseCategory[category] || 0;
+          const spending = categoryCurrMonthExpense[category] || 0;
 
           if (goalValue < spending) {
             isNeg = true;
@@ -243,6 +200,14 @@ const handleGoal=async(e)=>{
                       <Button onClick={handleEditCancel}  className="bg-Mulberry">
                         Cancel
                       </Button>
+                      <Tooltip color="danger" content="Delete user">
+                          <span
+                            onClick={() => DeleteGoal(goal.GoalID)}
+                            className="text-lg text-danger cursor-pointer active:opacity-50"
+                          >
+                            <DeleteIcon />
+                          </span>
+                        </Tooltip>
 
                       </div>
 
@@ -338,7 +303,6 @@ const handleGoal=async(e)=>{
             <Button onClick={handleCancel}  className="bg-Mulberry">
               Cancel
             </Button>
-
             </div>
 
           <Slider 
