@@ -4,6 +4,7 @@ import expenseReducer from "./features/expense/expenseSlice"
 import incomeReducer from "./features/income/incomeSlice"
 import goalReducer from "./features/goal/goalSlice"
 import subscriptionReducer from "./features/subscription/subscriptionSlice"
+import globalReducer from "./features/globalSlice"
 
 
 
@@ -20,6 +21,7 @@ export const makeStore = ()=>{
             income:incomeReducer,
             goal:goalReducer,
             subscription:subscriptionReducer,
+            global:globalReducer,
         },
         middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({

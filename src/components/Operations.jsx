@@ -6,6 +6,7 @@ import {useState,useEffect} from "react";
 //redux
 import { selectExpenseArray, setExpenseArray, selectMonthlyExpense, setMonthlyExpense, setCategoryExpense, selectCategoryExpense, setTotalExpense, selectTotalExpense,setCategoryCurrMonthExpense,selectCategoryCurrMonthExpense } from "@/lib/features/expense/expenseSlice";
 import { selectIncomeArray, setIncomeArray, selectMonthlyIncome, setMonthlyIncome, setTotalIncome, selectTotalIncome } from "@/lib/features/income/incomeSlice";
+import {selectTriggered,setTriggered,selectFormattedCurrentDate,selectCurrYear,selectCurrMonth,selectCurrentMonthAbbreviation, selectLastMonth, selectLastMonthAbbrev } from "@/lib/features/globalSlice";
 import {useAppSelector, useAppDispatch } from "@/lib/hooks"
 
 import DoughnutChart from "./Charts/DoughnutChart"
@@ -14,7 +15,6 @@ import BarChart from "./Charts/BarChart"
 
 import Goals from "./Goals"
 import Subscriptions from "./Subscriptions"
-import {DateFormatter} from "./DateFormatter"
 
 import {Select, SelectItem, Button} from "@nextui-org/react";
 import {SelectorIcon} from "./Icons";

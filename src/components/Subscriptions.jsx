@@ -13,7 +13,7 @@ import { useSession } from "next-auth/react"
 import { getSession } from "next-auth/react";
 
 //redux
-import { selectSubscriptionArray, setSubscriptionArray } from "@/lib/features/subscription/subscriptionSlice";
+import { selectSubscriptionArray, setSubscriptionArray,selectTriggered,setTriggered } from "@/lib/features/subscription/subscriptionSlice";
 import {setCategoryItems,selectCategoryItems, selectFormattedCurrentDate,setCategoryCurrMonthExpense,selectCategoryCurrMonthExpense,} from "@/lib/features/expense/expenseSlice";
 import {useAppSelector, useAppDispatch } from "@/lib/hooks"
 
@@ -36,9 +36,10 @@ const dispatch = useAppDispatch();
 const subData = useAppSelector(selectSubscriptionArray)
 const categoryItems = useAppSelector(selectCategoryItems);
 const formattedDate = useAppSelector(selectFormattedCurrentDate);
+const triggered = useAppSelector(selectTriggered);
 
 
-const [triggered, setTriggered] = useState(false);
+// const [triggered, setTriggered] = useState(false);
 const [addNewClicked,setAddNewClicked] = useState(false)
 
 
@@ -89,7 +90,7 @@ useEffect(() => {
       }
     };
     fetchSubscriptions();
-  }, [triggered,unpay]); // Empty dependency array ensures the effect runs only once,
+  }, [triggered,subData]); // Empty dependency array ensures the effect runs only once,
 
 
   useEffect(() => {
@@ -112,8 +113,8 @@ useEffect(() => {
               try{
               const body= { ...sub, "status": "Unpaid", "LastResetDate":formattedDate }
               const update = await updateSubscription(sub.subscriptionID,body)
-              setTriggered(!triggered);
-              setUnpay(!unpay)
+              dispatch(setTriggered(!triggered));
+              // setUnpay(!unpay)
               }
             catch (error) {
               console.error("Error updating expense:", error.message);
@@ -152,10 +153,6 @@ useEffect(() => {
     
   };
 
-  
-// useEffect(() => {
-//   console.log('editedValue:', editedValue);
-// }, [editedValue]);
 
 
 const handlePay = async(sub) => {
@@ -173,41 +170,22 @@ const handlePay = async(sub) => {
     // After saving, reset the editing state to null
     const body = {...sub, "status": "Paid","ExpenseID":ExpenseID }
     const update = await updateSubscription(sub.subscriptionID,body)
-    console.log("update",update)
-    setTriggered(!triggered);
-    setUnpay(!unpay);
+    // console.log("update",update)
+    dispatch(setTriggered(!triggered));
+    // setUnpay(!unpay);
     
 
 };
 
 
     const removePay =async(sub)=>{
-      const latestSession = await getSession();
       // Before Deleting, set status back to unpaid and ExpenseId to null to avoid foreignKey violations
       const body = {...sub, "status": "Unpaid","ExpenseID":null}
       const update = await updateSubscription(sub.subscriptionID,body)
-      // const update = await fetch(`http://localhost:3500/subscriptions/${sub.subscriptionID}`, {
-      //   method: "PUT",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //     "authorization": `Bearer ${latestSession?.user.accessToken}`,
-      //   },
-      //   body: JSON.stringify({...sub, "status": "Unpaid","ExpenseID":null}),
-      // });
-      // console.log("update",update)
-      // setPaid(true)
-      setTriggered(!triggered);
       const deleteResponse = await deleteExpense(sub.ExpenseID)
-      // const deleteResponse = await fetch(`http://localhost:3500/expense/${sub.ExpenseID}`,{
-      //   method:"DELETE",
-      //   headers:{
-      //       "Content-Type":"application/json",
-      //       "authorization":`Bearer ${latestSession?.user.accessToken}`
-      //   },
-      // })
-
+      dispatch(setTriggered(!triggered));
       // console.log("deleteResponse",deleteResponse)
-      setUnpay(!unpay);
+      // setUnpay(!unpay);
     }
 
   const renderCell = useCallback((sub, columnKey) => {
@@ -279,7 +257,7 @@ const handleSaveSub=async()=>{
   // console.log("goal posted",goal)
   //   // After saving, reset the editing state to null
     setAddNewClicked(false)
-    setTriggered(!triggered)
+    dispatch(setTriggered(!triggered))
     // setPopupVisible(false)
   
 }
