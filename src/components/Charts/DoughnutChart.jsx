@@ -4,7 +4,7 @@ import { Doughnut } from "react-chartjs-2";
 import ChartDataLabels from "chartjs-plugin-datalabels"; //Additional plugin to add Data labels inside the doughnut
 import { createLinearGradient } from "../LinearGradient"; // Manually written Function to create a linear gradient with multiple colors
 
-import {Select, SelectSection, SelectItem} from "@nextui-org/react";
+import {Select, SelectSection, SelectItem,} from "@nextui-org/react";
 import {SelectorIcon} from "../Icons";
 
 import {
@@ -50,12 +50,13 @@ import {
   selectLastMonthAbbrev,
   setAvailableYears,
   selectAvailableYears,
-  selectYearlyCategorySum,
-  setYearlyCategorySum,
-  selectMonthlyCategorySum,
-  setMonthlyCategorySum,
+  selectDoughnutExpenseSum,
+  setDoughnutExpenseSum,
   selectSelectedYear,
-  setSelectedYear
+  setSelectedYear,
+  setSelectedMonth,
+  selectSelectedMonth,
+  selectMonths,
 } from "@/lib/features/global/globalSlice";
 import { useAppSelector, useAppDispatch } from "@/lib/hooks";
 
@@ -67,9 +68,10 @@ const DoughnutChart = () => {
 
   const dispatch = useAppDispatch();
   const availableYears = useAppSelector(selectAvailableYears);
-  const yearlyCategorySum= useAppSelector(selectYearlyCategorySum);
-  const monthlyCategorySum = useAppSelector(selectMonthlyCategorySum);
+  const doughnutExpenseSum= useAppSelector(selectDoughnutExpenseSum);
   const selectedYear = useAppSelector(selectSelectedYear);
+  const selectedMonth = useAppSelector(selectSelectedMonth);
+  const monthsArray = useAppSelector(selectMonths);
   const expenseArray = useAppSelector(selectExpenseArray);
 
 
@@ -77,19 +79,19 @@ const DoughnutChart = () => {
     // console.log("expenseArray", expenseArray);
     console.log("selectedYear", typeof(selectedYear));
     console.log("Dispatching calculateCategorySum thunk");
-      calculateCategorySum(expenseArray,selectedYear,dispatch);
-  }, [expenseArray, selectedYear]);
+      calculateCategorySum(expenseArray,selectedYear,selectedMonth,dispatch);
+  }, [expenseArray, selectedYear, selectedMonth, dispatch]);
 
-  console.log("Yearly Category Sum:", yearlyCategorySum);
+
 
   const doughnutData = {
     // labels:Object.entries(totalCategory).map(([key, value]) => [key, value]),//Legend Text to be displayed
     //redux monthlyCat sum 
-    labels: Object.keys(yearlyCategorySum),
+    labels: Object.keys(doughnutExpenseSum),
     datasets: [
       {
         // label:"Categories",
-        data: Object.values(yearlyCategorySum),
+        data: Object.values(doughnutExpenseSum),
         backgroundColor: [
           // "#2a52be",//darkblue
           createLinearGradient(["#2769AE", "#4087AE", "#4EA6B6"]), //blue
@@ -114,7 +116,7 @@ const DoughnutChart = () => {
 
   const doughnutOptions = {
     cutout: `70%`, // size of hole in center
-    spacing: 3, //space between arcs
+    // spacing: 3, //space between arcs
     responsive: true,
     // maintainAspectRatio:false,
     borderWidth: 0, //borderWidth of arcs
@@ -139,6 +141,8 @@ const DoughnutChart = () => {
       },
       datalabels: {
         color: "white",
+        display:'auto',//one with the highest data index will be hidden. If labels are at the same data index, the one with the highest dataset index will be hidden
+        //display: 'auto' option can be used to prevent overlapping labels, based on the following rules when two labels overlap:
         padding: 3,
         font: {
           size: `9%`,
@@ -179,7 +183,7 @@ const DoughnutChart = () => {
   return (
     <div className="lg:w-2/5 md:w-1/2 sm:w-full shadow-lg my-10 p-3">
       <h2 className="text-center text-xl font-bold">Expense Breakdown</h2>
-      <div className=" text-white">
+      <div className=" text-white flex items-center justify-center gap-3 m-3">
         <Select
           // label="Favorite Animal"
           placeholder={selectedYear}
@@ -201,10 +205,46 @@ const DoughnutChart = () => {
             </SelectItem>
           ))}
         </Select>
+
+        {/* Select Month */}
+        <Select
+          // label="Favorite Animal"
+          placeholder={selectedMonth}
+          aria-label="Select a month"
+          // defaultSelectedKeys={["2024"]}
+          // labelPlacement="outside"
+          className="max-w-xs"
+          disableSelectorIconRotation
+          selectorIcon={<SelectorIcon />}
+          onChange={(e)=>dispatch(setSelectedMonth(e.target.value))}
+        >
+          {monthsArray.map((month) => (
+            <SelectItem
+              key={month}
+              value={month}
+              textValue={month}
+            >
+              {month}
+            </SelectItem>
+          ))}
+        </Select>
       </div>
-      <Doughnut data={doughnutData} options={doughnutOptions} />
+      
+      {Object.keys(doughnutExpenseSum).length === 0 ?
+(
+  <div className="flex flex-col items-center justify-center p-5">
+    <p>No Data For Selected Time Period</p>
+    <p>Please Try another Time Period</p>
+  </div>  
+  //  Close the inner div properly 
+  
+):(
+  <div>
+    <Doughnut data={doughnutData} options={doughnutOptions} />
+  </div>
+)}
     </div>
-  );
-};
+  )
+}
 
 export default DoughnutChart;

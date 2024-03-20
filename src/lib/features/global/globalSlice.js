@@ -9,20 +9,7 @@ const formattedDate = `${year}-${month}-${day}`;
 
 const lastMonth= month===12?1:month-1
 
-const months = [
-  "jan",
-  "feb",
-  "mar",
-  "apr",
-  "may",
-  "jun",
-  "jul",
-  "aug",
-  "sep",
-  "oct",
-  "nov",
-  "dec",
-];
+const months =  ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec","All"];
 
 const globalSlice = createSlice({
   name: "global",
@@ -34,10 +21,12 @@ const globalSlice = createSlice({
     currentMonthAbbreviation: months[month - 1],
     lastMonth:lastMonth,
     lastMonthAbbrev:months[lastMonth - 1],
+
     availableYears:[{key:2024,value:2024},],
-    yearlyCategorySum:{},
-    monthlyCategorySum:{},
+    doughnutExpenseSum:{},//Category wise expense summed for doughnut chart
     selectedYear:year,//present Year
+    selectedMonth:"All",//present Month Abbreviated (eg "Jan","Feb",..)
+    months:months,//month abbrevs
   },
   reducers: {
     setTriggered: (state, action) => {
@@ -46,19 +35,19 @@ const globalSlice = createSlice({
     setAvailableYears: (state, action) => {
       state.availableYears = action.payload;
     },
-    setYearlyCategorySum: (state, action) => {
-      state.yearlyCategorySum = action.payload;
-    },
-    setMonthlyCategorySum: (state, action) => {
-      state.monthlyCategorySum = action.payload;
+    setDoughnutExpenseSum: (state, action) => {
+      state.doughnutExpenseSum = action.payload;
     },
     setSelectedYear: (state, action) => {
       state.selectedYear = action.payload;
     },
+    setSelectedMonth: (state, action) => {
+      state.selectedMonth = action.payload;
+    },
   },
 });
 
-export const { setTriggered, setAvailableYears, setYearlyCategorySum, setMonthlyCategorySum, setSelectedYear } = globalSlice.actions;
+export const { setTriggered, setAvailableYears, setDoughnutExpenseSum, setSelectedYear , setSelectedMonth} = globalSlice.actions;
 
 export default globalSlice.reducer;
 
@@ -79,9 +68,13 @@ export const selectLastMonthAbbrev = (state) =>
 export const selectAvailableYears = (state) =>
   state.global.availableYears;
 
-export const selectYearlyCategorySum = (state) =>
-  state.global.yearlyCategorySum;
-export const selectMonthlyCategorySum = (state) =>
-  state.global.monthlyCategorySum;
+export const selectDoughnutExpenseSum = (state) =>
+  state.global.doughnutExpenseSum;
 export const selectSelectedYear = (state) =>
   state.global.selectedYear;
+export const selectSelectedMonth= (state) =>
+  state.global.selectedMonth;
+
+  //The months array with abbreviatons for each month
+export const selectMonths= (state) =>
+  state.global.months;

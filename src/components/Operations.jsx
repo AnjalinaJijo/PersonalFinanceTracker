@@ -45,16 +45,13 @@ import BarChart from "./Charts/BarChart";
 import Goals from "./Goals";
 import Subscriptions from "./Subscriptions";
 
-import { Select, SelectItem, Button } from "@nextui-org/react";
-import { SelectorIcon } from "./Icons";
-
 export function Operations() {
   const dispatch = useAppDispatch();
   const getExpenseData = useAppSelector(selectExpenseArray);
   const getIncomeData = useAppSelector(selectIncomeArray);
   const monthlyExpense = useAppSelector(selectMonthlyExpense);
   const monthlyIncome = useAppSelector(selectMonthlyIncome);
-  const totalExpenseCategory = useAppSelector(selectCategoryExpense);
+  // const totalExpenseCategory = useAppSelector(selectCategoryExpense);
   const availableYears = useAppSelector(selectAvailableYears);
   // const categoryCurrMonthExpense = useAppSelector(selectCategoryCurrMonthExpense);
 
@@ -176,54 +173,12 @@ export function Operations() {
     }
   };
 
-  const calculateCategorySum = (data) => {
-    const newTotalCat = {};
-    const newMonthlyCat = {};
-
-    data.map((entry) => {
-      const currentDate = new Date();
-      const currMonth = currentDate.getMonth();
-
-      const date = new Date(entry.Date);
-      // const month = 1;
-      const month = date.getMonth();
-      const year = date.getFullYear();
-
-      //CALCULATE CATEGORY SUM FOR CURRENT MONTH
-      if (month === currMonth && year === lineYear) {
-        const category = entry.Category;
-
-        // Initialize the category sum if not exists
-        if (!newMonthlyCat[category]) {
-          newMonthlyCat[category] = 0;
-        }
-
-        newMonthlyCat[category] += parseInt(entry.Amount);
-      }
-
-      //CALCULATE CATEGORY SUM FOR CURRENT YEAR
-      if (year === lineYear) {
-        const category = entry.Category;
-
-        // Initialize the category sum if not exists
-        if (!newTotalCat[category]) {
-          newTotalCat[category] = 0;
-        }
-
-        newTotalCat[category] += parseInt(entry.Amount);
-      }
-    });
-    // console.log('totalMOOOO',newMonthlyCat)
-    // setTotalExpenseCategory(newTotalCat)
-    dispatch(setCategoryExpense(newTotalCat));
-    dispatch(setCategoryCurrMonthExpense(newMonthlyCat));
-  };
 
   const calculateMonthlyData = () => {
     const monIncome = calculateMonthlyTotal(getIncomeData, "income");
     const monExpense = calculateMonthlyTotal(getExpenseData, "expense");
 
-    calculateCategorySum(getExpenseData);
+    // calculateCategorySum(getExpenseData);
   };
   useEffect(() => {
     // console.log('woow', lineYear);
