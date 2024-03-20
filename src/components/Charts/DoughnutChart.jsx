@@ -74,10 +74,10 @@ const DoughnutChart = () => {
 
 
   useEffect(() => {
-    const recalculateCategorySums = () => {
+    // console.log("expenseArray", expenseArray);
+    console.log("selectedYear", typeof(selectedYear));
+    console.log("Dispatching calculateCategorySum thunk");
       calculateCategorySum(expenseArray,selectedYear,dispatch);
-    };
-    recalculateCategorySums();
   }, [expenseArray, selectedYear]);
 
   console.log("Yearly Category Sum:", yearlyCategorySum);
@@ -189,7 +189,7 @@ const DoughnutChart = () => {
           className="max-w-xs"
           disableSelectorIconRotation
           selectorIcon={<SelectorIcon />}
-          onChange={(e)=>dispatch(setSelectedYear(e.target.value))}
+          onChange={(e)=>dispatch(setSelectedYear(parseInt(e.target.value)))}
         >
           {availableYears.map((year) => (
             <SelectItem

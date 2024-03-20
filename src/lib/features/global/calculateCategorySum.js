@@ -1,6 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { setYearlyCategorySum, setMonthlyCategorySum } from "./globalSlice"; // Import action creators
-import { useAppSelector, useAppDispatch } from "@/lib/hooks";
 
 
 // Define the thunk to calculate category sums
@@ -11,7 +10,7 @@ import { useAppSelector, useAppDispatch } from "@/lib/hooks";
   const calculateCategorySum = (data,selectedYear,dispatch)=>{
 
     console.log("Inside calculateCategorySum")
-      // const dispatch = useAppDispatch();
+    
       const newTotalCat = {};
       const newMonthlyCat = {};
   
@@ -23,17 +22,25 @@ import { useAppSelector, useAppDispatch } from "@/lib/hooks";
         const date = new Date(entry.Date);
         const month = date.getMonth();
         const year = date.getFullYear();
-  
+        console.log("year",year)
+        
         // Calculate category sum for current month
         if (month === currMonth && year === selectedYear) {
+          
+         
           const category = entry.Category;
+          
+          
           newMonthlyCat[category] = (newMonthlyCat[category] || 0) + parseInt(entry.Amount);
         }
   
         // Calculate category sum for current year
         if (year === selectedYear) {
+         
           const category = entry.Category;
+          console.log("category",category)
           newTotalCat[category] = (newTotalCat[category] || 0) + parseInt(entry.Amount);
+          console.log("newTotal",newTotalCat)
         }
       });
 

@@ -35,7 +35,6 @@ const globalSlice = createSlice({
     lastMonth:lastMonth,
     lastMonthAbbrev:months[lastMonth - 1],
     availableYears:[{key:2024,value:2024},],
-
     yearlyCategorySum:{},
     monthlyCategorySum:{},
     selectedYear:year,//present Year
