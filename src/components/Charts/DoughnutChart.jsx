@@ -60,7 +60,7 @@ import {
 } from "@/lib/features/global/globalSlice";
 import { useAppSelector, useAppDispatch } from "@/lib/hooks";
 
-import calculateCategorySum from '@/lib/features/global/calculateCategorySum'; // Import the thunk
+import CalculateCategorySum from '@/lib/features/global/CalculateCategorySum'; // Import the thunk
 
 import { useEffect } from "react";
 
@@ -79,7 +79,7 @@ const DoughnutChart = () => {
     // console.log("expenseArray", expenseArray);
     console.log("selectedYear", typeof(selectedYear));
     console.log("Dispatching calculateCategorySum thunk");
-      calculateCategorySum(expenseArray,selectedYear,selectedMonth,dispatch);
+      CalculateCategorySum(expenseArray,selectedYear,selectedMonth,dispatch);
   }, [expenseArray, selectedYear, selectedMonth, dispatch]);
 
 

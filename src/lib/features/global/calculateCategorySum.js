@@ -9,7 +9,7 @@ import { setDoughnutExpenseSum } from "./globalSlice"; // Import action creators
 // export const calculateCategorySum = createAsyncThunk(
 //     'expenses/calculateCategorySum',
 //     async ({data,selectedYear}, { dispatch }) => {
-  const calculateCategorySum = (data,selectedYear,selectedMonth,dispatch)=>{
+  const CalculateCategorySum = (data,selectedYear,selectedMonth,dispatch)=>{
     console.log("Inside calculateCategorySum")
     
       const newTotalCat = {};
@@ -62,4 +62,4 @@ import { setDoughnutExpenseSum } from "./globalSlice"; // Import action creators
   // );
   }
 
-  export default calculateCategorySum
+  export default CalculateCategorySum

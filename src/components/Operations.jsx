@@ -105,7 +105,7 @@ export function Operations() {
         const monIncome = calculateMonthlyTotal(incomeResponse, "income");
         const monExpense = calculateMonthlyTotal(expenseResponse, "expense");
 
-        calculateCategorySum(expenseResponse);
+        // calculateCategorySum(expenseResponse);
         // setTotalExpenseCategory(CategorySum);
       } catch (error) {
         console.error("Error fetching data:", error.message);
@@ -221,8 +221,6 @@ export function Operations() {
         <DoughnutChart />
         {/* totalCategory={totalExpenseCategory} */}
         <LineChart
-          monthlyExpense={monthlyExpense}
-          monthlyIncome={monthlyIncome}
         />
         <BarChart
           monthlyExpense={monthlyExpense}
