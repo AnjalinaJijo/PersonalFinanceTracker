@@ -150,18 +150,19 @@ const LineChart = () => {
 
   return (
     <div className="w-full h-500 md:w-1/2 lg:w-1/2 p-5 shadow-lg">
-           
+    <h2 className="text-center text-xl font-bold">Expense and Income</h2>
 
     <CalculateMonthlySum />{/* returns null but calcs monthlySum */}
 
-      <div className=" text-white flex items-center justify-center gap-3 m-3">
+      <div className=" text-white flex items-center justify-start gap-3 m-3">
         <Select
-          // label="Favorite Animal"
+          label="Year"
+          variant='underlined'
           placeholder={selectedLineYear}
           aria-label="Select a year"
           // defaultSelectedKeys={["2024"]}
           // labelPlacement="outside"
-          className="max-w-xs"
+          className="max-w-xs w-xs"
           disableSelectorIconRotation
           selectorIcon={<SelectorIcon />}
           onChange={(e) => dispatch(setSelectedLineYear(parseInt(e.target.value)))}

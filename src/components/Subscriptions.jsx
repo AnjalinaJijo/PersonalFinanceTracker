@@ -15,6 +15,7 @@ import { getSession } from "next-auth/react";
 //redux
 import { selectSubscriptionArray, setSubscriptionArray,selectTriggered,setTriggered } from "@/lib/features/subscription/subscriptionSlice";
 import {setCategoryItems,selectCategoryItems, selectFormattedCurrentDate,setCategoryCurrMonthExpense,selectCategoryCurrMonthExpense,} from "@/lib/features/expense/expenseSlice";
+import {selectCurrentMonthAbbreviation} from "@/lib/features/global/globalSlice";
 import {useAppSelector, useAppDispatch } from "@/lib/hooks"
 
 import { PlusIcon } from "./Icons"
@@ -37,6 +38,7 @@ const subData = useAppSelector(selectSubscriptionArray)
 const categoryItems = useAppSelector(selectCategoryItems);
 const formattedDate = useAppSelector(selectFormattedCurrentDate);
 const triggered = useAppSelector(selectTriggered);
+const currMonth = useAppSelector(selectCurrentMonthAbbreviation);
 
 
 // const [triggered, setTriggered] = useState(false);
@@ -468,7 +470,7 @@ const handleCancelSub=()=>{
   return (
     <div className="w-full">
       <div className="flex justify-center items-center mb-5">
-          <h1>Monthly Subscription</h1>
+          <h1>{currMonth} Subscriptions</h1>
           <div className="px-6">
           <Button onClick={handleAddNew} isIconOnly aria-label="Add Goals" className="bg-CarolinaBlue">
               <PlusIcon />

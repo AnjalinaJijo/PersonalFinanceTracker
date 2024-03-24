@@ -45,7 +45,7 @@ async function refreshToken(user) {
     ...user,
     "accessToken":accessToken,
     "refreshToken":refreshToken,
-    "expiresIn":Date.now()+60*1000
+    "expiresIn":Date.now()+10*1000
   };
 }
 
@@ -139,7 +139,7 @@ async function refreshToken(user) {
                  }
 
                 // console.log('token.exp * 1000',token.exp * 1000)
-                console.log('Date.now()+60*1000',token.user.expiresIn)
+                console.log('Date.now()+10*1000',token.user.expiresIn)
                 console.log('Date now',Date.now())
                     
                 if (Date.now() < token.user.expiresIn){

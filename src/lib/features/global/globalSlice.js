@@ -10,6 +10,20 @@ const formattedDate = `${year}-${month}-${day}`;
 const lastMonth= month===12?1:month-1
 
 const months =  ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec","All"];
+const monthsFullNames = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December"
+];
 
 const globalSlice = createSlice({
   name: "global",
@@ -18,16 +32,19 @@ const globalSlice = createSlice({
     formattedCurrentDate: formattedDate,
     currYear: year,
     currMonth: month,
-    currentMonthAbbreviation: months[month - 1],
+    currentMonthAbbreviation: monthsFullNames[month - 1],
     lastMonth:lastMonth,
-    lastMonthAbbrev:months[lastMonth - 1],
+    lastMonthAbbrev:monthsFullNames[lastMonth - 1],
 
     availableYears:[{key:2024,value:2024},],
     doughnutExpenseSum:{},//Category wise expense summed for doughnut chart
     monthlyExpenseSum:{},//month wise expense summed for line chart
     monthlyIncomeSum:{},//month wise expense summed for line chart
+    monthlyExpenseBarSum:{},
+    monthlyIncomeBarSum:{},
     selectedYear:year,//present Year
     selectedLineYear:year,//present Year
+    selectedBarYear:year,//present Year
     selectedMonth:"All",//present Month Abbreviated (eg "Jan","Feb",..)
     months:months,//month abbrevs
   },
@@ -47,11 +64,20 @@ const globalSlice = createSlice({
     setMonthlyIncomeSum: (state, action) => {
       state.monthlyIncomeSum = action.payload;
     },
+    setMonthlyExpenseBarSum: (state, action) => {
+      state.monthlyExpenseBarSum = action.payload;
+    },
+    setMonthlyIncomeBarSum: (state, action) => {
+      state.monthlyIncomeBarSum = action.payload;
+    },
     setSelectedYear: (state, action) => {
       state.selectedYear = action.payload;
     },
     setSelectedLineYear: (state, action) => {
       state.selectedLineYear = action.payload;
+    },
+    setSelectedBarYear: (state, action) => {
+      state.selectedBarYear = action.payload;
     },
     setSelectedMonth: (state, action) => {
       state.selectedMonth = action.payload;
@@ -59,7 +85,7 @@ const globalSlice = createSlice({
   },
 });
 
-export const { setTriggered, setAvailableYears, setDoughnutExpenseSum,setMonthlyExpenseSum,setMonthlyIncomeSum, setSelectedYear , setSelectedLineYear,setSelectedMonth} = globalSlice.actions;
+export const { setTriggered, setAvailableYears, setDoughnutExpenseSum,setMonthlyExpenseSum,setMonthlyIncomeSum,setMonthlyExpenseBarSum,setMonthlyIncomeBarSum, setSelectedYear , setSelectedLineYear,setSelectedBarYear,setSelectedMonth} = globalSlice.actions;
 
 export default globalSlice.reducer;
 
@@ -86,10 +112,16 @@ export const selectMonthlyExpenseSum = (state) =>
   state.global.monthlyExpenseSum;
 export const selectMonthlyIncomeSum = (state) =>
   state.global.monthlyIncomeSum;
+  export const selectMonthlyExpenseBarSum = (state) =>
+  state.global.monthlyExpenseBarSum;
+export const selectMonthlyIncomeBarSum = (state) =>
+  state.global.monthlyIncomeBarSum;
 export const selectSelectedYear = (state) =>
   state.global.selectedYear;
 export const selectSelectedLineYear = (state) =>
   state.global.selectedLineYear;
+export const selectSelectedBarYear = (state) =>
+  state.global.selectedBarYear;
 export const selectSelectedMonth= (state) =>
   state.global.selectedMonth;
 

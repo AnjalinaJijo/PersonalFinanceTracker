@@ -7,6 +7,7 @@ import {Button,Tooltip,Slider,Input,Dropdown,DropdownItem,DropdownMenu,DropdownS
 
 //redux
 import { selectGoalArray, setGoalArray } from "@/lib/features/goal/goalSlice";
+import { selectCurrentMonthAbbreviation } from "@/lib/features/global/globalSlice";
 import {setCategoryItems,selectCategoryItems, selectFormattedCurrentDate,setCategoryCurrMonthExpense,selectCategoryCurrMonthExpense,} from "@/lib/features/expense/expenseSlice";
 import {useAppSelector, useAppDispatch } from "@/lib/hooks"
 
@@ -23,6 +24,7 @@ const Goals = () => {
   const categoryItems = useAppSelector(selectCategoryItems);
   const formattedDate = useAppSelector(selectFormattedCurrentDate);
   const categoryCurrMonthExpense = useAppSelector(selectCategoryCurrMonthExpense);
+  const currMonth = useAppSelector(selectCurrentMonthAbbreviation);
 
 
 
@@ -135,7 +137,7 @@ const DeleteGoal= async(GoalID) =>{
   return (
     <div className="m-5 w-full px-5">
        <div className="flex justify-center items-center">
-          <h1>Goal Progress for this Month</h1>
+          <h1> {currMonth} Goal Progress</h1>
           <div className="px-6">
           <Button onClick={handleAddNew} isIconOnly aria-label="Add Goals" className="bg-CarolinaBlue">
               <PlusIcon />

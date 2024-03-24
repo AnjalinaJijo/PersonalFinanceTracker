@@ -183,14 +183,17 @@ const DoughnutChart = () => {
   return (
     <div className="lg:w-2/5 md:w-1/2 sm:w-full shadow-lg my-10 p-3">
       <h2 className="text-center text-xl font-bold">Expense Breakdown</h2>
-      <div className=" text-white flex items-center justify-center gap-3 m-3">
+      <div className=" text-white flex items-center justify-center gap-6 m-5">
         <Select
-          // label="Favorite Animal"
+          // labelPlacement='inside'
+          label="Year"
+          variant='underlined'
           placeholder={selectedYear}
           aria-label="Select a year"
           // defaultSelectedKeys={["2024"]}
-          // labelPlacement="outside"
           className="max-w-xs"
+          radius="full"
+          // size="xs"
           disableSelectorIconRotation
           selectorIcon={<SelectorIcon />}
           onChange={(e)=>dispatch(setSelectedYear(parseInt(e.target.value)))}
@@ -208,9 +211,12 @@ const DoughnutChart = () => {
 
         {/* Select Month */}
         <Select
-          // label="Favorite Animal"
+          label="Month"
+          variant='underlined'
           placeholder={selectedMonth}
           aria-label="Select a month"
+          // size="xs"
+          radius="full"
           // defaultSelectedKeys={["2024"]}
           // labelPlacement="outside"
           className="max-w-xs"

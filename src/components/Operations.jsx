@@ -223,8 +223,6 @@ export function Operations() {
         <LineChart
         />
         <BarChart
-          monthlyExpense={monthlyExpense}
-          monthlyIncome={monthlyIncome}
         />
       </div>
       <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-4">
