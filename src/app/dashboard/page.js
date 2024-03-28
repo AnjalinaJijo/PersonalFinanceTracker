@@ -1,9 +1,10 @@
 // `use client`
-`useSession({ required: true })`
+// `useSession({ required: true })`
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route.js";
 import { Operations } from "../../components/Operations.jsx";
+import SessionExpirationHandler from "../../components/SessionExpirationHandler";
 
 export default async function Dashboard() {
   const session = await getServerSession(authOptions);

@@ -29,7 +29,7 @@ async function refreshToken(user) {
   if (res.status === 403) {
     console.log("Token refresh failed. Status: 403 Forbidden");
     // signOut("/login")
-    return user;
+    return "Expired";
   }
 
   const response = await res.json();

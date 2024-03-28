@@ -4,8 +4,9 @@ import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "next-themes";
 import { useSession } from "next-auth/react";
 import { signOut } from "next-auth/react";
+// import { useRouter } from 'next/router';
 
-import SessionExpirationHandler from "./SessionExpirationHandler";
+
 
 import { NextUIProvider } from "@nextui-org/react";
 // import { ThemeProvider as NextThemesProvider } from 'next-themes'
@@ -14,6 +15,7 @@ interface Props {
   children: ReactNode;
 }
 const Providers = ({ children }: Props) => {
+  // const router =  useRouter()
   // const { data: session } = useSession()
 
   //   useEffect(() => {
@@ -27,7 +29,6 @@ const Providers = ({ children }: Props) => {
   return (
     <ThemeProvider attribute="class">
       <SessionProvider refetchInterval={10}>
-        <SessionExpirationHandler />
         <NextUIProvider>{children}</NextUIProvider>
       </SessionProvider>
     </ThemeProvider>
