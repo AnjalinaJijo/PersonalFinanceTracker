@@ -185,7 +185,6 @@ const DoughnutChart = () => {
       <h2 className="text-center text-xl font-bold">Expense Breakdown</h2>
       <div className=" text-white flex items-center justify-center gap-6 m-5">
         <Select
-          // labelPlacement='inside'
           label="Year"
           variant='underlined'
           placeholder={selectedYear}

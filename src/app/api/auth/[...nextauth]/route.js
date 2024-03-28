@@ -1,13 +1,12 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { useDispatch } from "react-redux";
+// import { useRouter } from "next/router";
 //redux
 // Import your store instance
 import { makeStore } from "@/lib/store";
 import { login } from "@/lib/features/auth/authSlice";
-// import { loginAPI } from "@/lib/features/auth/authSlice";
-
-import { setCookie } from "nookies";
+import { signOut } from "next-auth/react";
 
 // import { NextAuthOptions } from "next-auth";
 import { JWT } from "next-auth/jwt";
@@ -16,7 +15,8 @@ import NextAuth from "next-auth/next";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 
 async function refreshToken(user) {
-  console.log("user inside refresh", user);
+
+  // console.log("user inside refresh", user);
   const res = await fetch("http://localhost:3500/refresh", {
     method: "POST",
     headers: {
@@ -28,23 +28,25 @@ async function refreshToken(user) {
   // Check if the response status is 403
   if (res.status === 403) {
     console.log("Token refresh failed. Status: 403 Forbidden");
+    // signOut("/login")
     return user;
   }
 
   const response = await res.json();
 
-  console.log("refreshed values IMMPP",response)
-  const { accessToken, refreshToken } = response;
+  // console.log("refreshed values IMMPP", response);
+  const { accessToken, refreshToken, ExpiresIn } = response;
 
   return {
     ...user,
     accessToken: accessToken,
     refreshToken: refreshToken,
-    // expiresIn: Date.now() + 10 * 1000,
+    ExpiresIn: ExpiresIn,
   };
 }
 
 export const authOptions = {
+
   providers: [
     //1. Google Provider
     // GoogleProvider({
@@ -103,7 +105,7 @@ export const authOptions = {
             return null;
           }
         } catch (error) {
-          console.error("Error during login", error);
+          // console.error("Error during login", error);
           // Handle the error accordingly
           return null;
         }
@@ -120,7 +122,9 @@ export const authOptions = {
   // },
   session: {
     strategy: "jwt",
-    maxAge: 24 * 60 * 60, // 60s * 60min*24 hr = 24 hr = 1 day
+    //the client side jwt expires in maxAge secs of "Inactivity"
+    maxAge: 30, // 60s *60 = 60 min ie 1 hr
+    //60sec * 60min*24 hr = 24 hr = 1 day
   },
   debug: true,
   //callback works only on signin
@@ -128,11 +132,6 @@ export const authOptions = {
     //jwt callback to get accessToken
     async jwt({ token, user }) {
       //jwt call back is called everytime the session is checked
-
-      // console.log('Received token:', token);
-      //  console.log('Received user:', user);
-      //  console.log('Received account:', account)
-
       if (user) {
         token.user = user;
         // token.user.expiresIn = Date.now() + parseInt(user.expiresIn) * 1000;
@@ -145,19 +144,19 @@ export const authOptions = {
       // console.log("Date now", Date.now());
 
       // if (Date.now() < token.user.expiresIn) {
-        if(new Date().getTime() < token.user.ExpiresIn){
+      if (new Date().getTime() < token.user.ExpiresIn) {
         // Token has not expired yet, return it
         return token;
       } else {
         // Token has expired, try to refresh it
-        console.log("Token has Expired! Refreshing...")
+        // console.log("Token has Expired! Refreshing...");
         try {
           const refreshedUser = await refreshToken(token.user);
           // return await refreshToken(token.user);
           const refreshedToken = { ...token, user: refreshedUser };
           return refreshedToken;
         } catch (error) {
-          console.error("Error refreshing access token", error);
+          // console.error("Error refreshing access token", error);
           // Handle the refresh token error, you may want to redirect the user to reauthenticate
           return { ...token, error: "RefreshAccessTokenError" };
         }
@@ -165,10 +164,11 @@ export const authOptions = {
       }
     },
 
-    async session({ token,session }) {
+    async session({ token, session }) {
+      // const router = useRouter();
       //IMP : here user is the entire return value from jwt callback
       session.user = token.user;
-      // console.log('session inside session',session)
+      // console.log("session inside session", session);
       return session;
     },
 

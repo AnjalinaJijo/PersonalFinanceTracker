@@ -2,6 +2,7 @@
 import getIncome from "../lib/fetchFunctions/income/getIncome";
 import getExpense from "../lib/fetchFunctions/expense/getExpense";
 import { useState, useEffect } from "react";
+import { signIn, signOut, useSession } from "next-auth/react";
 
 //redux
 import {
@@ -46,6 +47,9 @@ import Goals from "./Goals";
 import Subscriptions from "./Subscriptions";
 
 export function Operations() {
+
+  const { data: session } = useSession(); 
+
   const dispatch = useAppDispatch();
   const getExpenseData = useAppSelector(selectExpenseArray);
   const getIncomeData = useAppSelector(selectIncomeArray);
@@ -54,6 +58,17 @@ export function Operations() {
   // const totalExpenseCategory = useAppSelector(selectCategoryExpense);
   const availableYears = useAppSelector(selectAvailableYears);
   // const categoryCurrMonthExpense = useAppSelector(selectCategoryCurrMonthExpense);
+
+
+  
+  //To signOut to login Page once signedOut
+  // useEffect(() => {
+  //   // check if the error has occurred
+  //   if (!session) {
+  //       // Sign out here
+  //       signOut("/login");
+  //   }
+  // }, [session]);
 
   const monthlyData = {
     Jan: 0,

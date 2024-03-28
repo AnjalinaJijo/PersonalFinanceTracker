@@ -2,13 +2,13 @@
 import Link from "next/link"
 
 import { signIn, signOut, useSession } from "next-auth/react";
-import React from "react";
+import React,{useEffect} from "react";
 import { RxPerson } from "react-icons/rx";
 import { GiHamburgerMenu } from "react-icons/gi";
 
 
 const SigninButton = () => {
-  const { data: session } = useSession();
+  const { data: session } = useSession(); 
   console.log('session user',session?.user);
   console.log('session',session);
 

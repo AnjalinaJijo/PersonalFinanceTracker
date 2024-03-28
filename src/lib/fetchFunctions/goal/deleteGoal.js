@@ -6,7 +6,7 @@ import { authOptions } from "../../../app/api/auth/[...nextauth]/route.js";
 export default async function deleteGoal(GoalID){
     const session = await getServerSession(authOptions);
  
-    const deleteResponse = await fetch(`http://localhost:3500/goal/${GoalID}`,{
+    const deleteResponse = await fetch(`http://localhost:3500/goals/${GoalID}`,{
         method:"DELETE",
         headers:{
             "Content-Type":"application/json",
